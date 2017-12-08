@@ -1,0 +1,479 @@
+<!--suppress XmlUnboundNsPrefix, XmlUnusedNamespaceDeclaration -->
+<book xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	contentType="monograph" contentProvider="3">
+	<bookInfo>
+		<ocr>1.05</ocr>
+		<PSMID>eapb_mon_14501A_033</PSMID>
+		<pubDate>
+			<year>1647</year>
+			<composed>1647</composed>
+			<pubDateStart>16470000</pubDateStart>
+		</pubDate>
+		<releaseDate>20150803</releaseDate>
+		<sourceLibrary>
+			<libraryName>British Library</libraryName>
+			<libraryLocation>London</libraryLocation>
+			<libraryShelfmark>14501.a.33</libraryShelfmark>
+		</sourceLibrary>
+		<language ocr="Syriac" primary="Y" ISO-639-2="syc">Syriac</language>
+		<language ocr="Arabic" primary="N" ISO-639-1="ar" ISO-639-2="ara">Arabic</language>
+		<documentType>Monograph</documentType>
+		<comments ISO-639-1="la" ISO-639-2="lat">Text in Syriac and in
+			Arabic in Syriac character</comments>
+		<comments ISO-639-1="la" ISO-639-2="lat">[Partly in Syriac, partly
+			in Arabic in the Syriac character.]
+		</comments>
+		<locSubjectHead type="corporateName">
+			<locSubject subField="a">Catholic Church</locSubject>
+			<locSubject subField="x">Maronite rite</locSubject>
+			<locSubject subField="x">Liturgy</locSubject>
+		</locSubjectHead>
+		<locSubjectHead type="topicalTerm">
+			<locSubject subField="a">Christianity</locSubject>
+		</locSubjectHead>
+	</bookInfo>
+	<citation>
+		<authorGroup ISO-639-1="la" ISO-639-2="lat" role="author">
+			<byline>
+				<corporateName ISO-639-1="la" ISO-639-2="lat">Catholic
+					Church</corporateName>
+			</byline>
+		</authorGroup>
+		<titleGroup>
+			<fullTitle ISO-639-2="syc">ܙܬܚ ܐܠܨܠܝܒ ܐܠܡܩܕܣ ܘܫܪ</fullTitle>
+			<title-transliterated ISO-639-1="la" ISO-639-2="lat">Processio
+				Sanctissimae Crucis</title-transliterated>
+		</titleGroup>
+		<volumeGroup>
+			<volume>0</volume>
+			<totalVolumes>0</totalVolumes>
+		</volumeGroup>
+		<imprint>
+			<imprintFull ISO-639-1="la" ISO-639-2="lat">Romae: Typis Sac.
+				Congreg. de Propaganda Fide, 1647
+			</imprintFull>
+			<imprintPublisher ISO-639-1="la" ISO-639-2="lat">Typis
+				Sac. Congreg. de Propaganda Fide</imprintPublisher>
+		</imprint>
+		<collation>23 pages; 12º</collation>
+		<publicationPlace>
+			<publicationPlaceCity ISO-639-1="la" ISO-639-2="lat">Romae</publicationPlaceCity>
+			<publicationPlaceComposed ISO-639-1="la"
+				ISO-639-2="lat">Romae</publicationPlaceComposed>
+		</publicationPlace>
+		<publicationPlace>
+			<publicationPlaceCity ISO-639-1="en" ISO-639-2="eng">Rome</publicationPlaceCity>
+			<publicationPlaceComposed ISO-639-1="en"
+				ISO-639-2="eng">Rome</publicationPlaceComposed>
+		</publicationPlace>
+		<totalPages>26</totalPages>
+	</citation>
+	<text>
+		<page type="frontmatter" firstPage="Yes">
+			<pageInfo>
+				<pageID>00010</pageID>
+				<ocr>0.00</ocr>
+				<imageLink pageIndicator="single" width="1493" height="2306"
+					type="jpeg" colorimage="color">
+					eapb_mon_14501A_033_00010
+				</imageLink>
+			</pageInfo>
+			<pageContent>
+				<p>
+					<wd pos="0,0,0,0" />
+				</p>
+			</pageContent>
+		</page>
+		<page type="titlepage" firstPage="Yes">
+			<pageInfo>
+				<pageID>00020</pageID>
+				<ocr>27.36</ocr>
+				<ocrLanguage ISO-639-1="la" ISO-639-2="lat">Latin</ocrLanguage>
+				<imageLink pageIndicator="single" width="1402" height="2306"
+					type="jpeg" colorimage="color">
+					eapb_mon_14501A_033_00020
+				</imageLink>
+			</pageInfo>
+			<pageContent>
+				<p ISO-639-1="la" ISO-639-2="lat">
+					<wd pos="333,125,1019,189">SANCTISSIMAE</wd>
+				</p>
+				<p ISO-639-1="la" ISO-639-2="lat">
+					<wd pos="585,213,651,281">V</wd>
+					<wd pos="727,211,799,283">C</wd>
+					<wd pos="875,213,895,281">I</wd>
+					<wd pos="981,221,1029,287">i'</wd>
+					<wd pos="1053,193,1189,281">i*/■</wd>
+					<wd pos="1235,189,1381,277">*Sc</wd>
+				</p>
+				<p ISO-639-1="la" ISO-639-2="lat">
+					<wd pos="45,1939,375,1999">ROMAE,Typis</wd>
+					<wd pos="397,1946,753,2003">Sac.Congreg.de</wd>
+					<wd pos="763,1949,1019,2009">Propaganda</wd>
+					<wd pos="1028,1948,1132,1999">Fide.</wd>
+					<wd pos="1152,1961,1277,2008">1647.</wd>
+				</p>
+			</pageContent>
+		</page>
+		<page type="frontmatter" firstPage="No">
+			<pageInfo>
+				<pageID>00030</pageID>
+				<ocr>0.00</ocr>
+				<imageLink pageIndicator="single" width="1402" height="2306"
+					type="jpeg" colorimage="color">
+					eapb_mon_14501A_033_00030
+				</imageLink>
+			</pageInfo>
+			<pageContent>
+				<p>
+					<wd pos="0,0,0,0" />
+				</p>
+			</pageContent>
+		</page>
+		<page type="bodypage" firstPage="Yes">
+			<pageInfo>
+				<pageID>00040</pageID>
+				<ocr>0.00</ocr>
+				<imageLink pageIndicator="single" width="1402" height="2306"
+					type="jpeg" colorimage="color">
+					eapb_mon_14501A_033_00040
+				</imageLink>
+			</pageInfo>
+			<pageContent>
+				<p>
+					<wd pos="0,0,0,0" />
+				</p>
+			</pageContent>
+		</page>
+		<page type="bodypage" firstPage="No">
+			<pageInfo>
+				<pageID>00050</pageID>
+				<ocr>0.00</ocr>
+				<imageLink pageIndicator="single" width="1402" height="2306"
+					type="jpeg" colorimage="color">
+					eapb_mon_14501A_033_00050
+				</imageLink>
+			</pageInfo>
+			<pageContent>
+				<p>
+					<wd pos="0,0,0,0" />
+				</p>
+			</pageContent>
+		</page>
+		<page type="bodypage" firstPage="No">
+			<pageInfo>
+				<pageID>00060</pageID>
+				<ocr>0.00</ocr>
+				<imageLink pageIndicator="single" width="1402" height="2306"
+					type="jpeg" colorimage="color">
+					eapb_mon_14501A_033_00060
+				</imageLink>
+			</pageInfo>
+			<pageContent>
+				<p>
+					<wd pos="0,0,0,0" />
+				</p>
+			</pageContent>
+		</page>
+		<page type="bodypage" firstPage="No">
+			<pageInfo>
+				<pageID>00070</pageID>
+				<ocr>0.00</ocr>
+				<imageLink pageIndicator="single" width="1402" height="2306"
+					type="jpeg" colorimage="color">
+					eapb_mon_14501A_033_00070
+				</imageLink>
+			</pageInfo>
+			<pageContent>
+				<p>
+					<wd pos="0,0,0,0" />
+				</p>
+			</pageContent>
+		</page>
+		<page type="bodypage" firstPage="No">
+			<pageInfo>
+				<pageID>00080</pageID>
+				<ocr>0.00</ocr>
+				<imageLink pageIndicator="single" width="1402" height="2306"
+					type="jpeg" colorimage="color">
+					eapb_mon_14501A_033_00080
+				</imageLink>
+			</pageInfo>
+			<pageContent>
+				<p>
+					<wd pos="0,0,0,0" />
+				</p>
+			</pageContent>
+		</page>
+		<page type="bodypage" firstPage="No">
+			<pageInfo>
+				<pageID>00090</pageID>
+				<ocr>0.00</ocr>
+				<imageLink pageIndicator="single" width="1402" height="2306"
+					type="jpeg" colorimage="color">
+					eapb_mon_14501A_033_00090
+				</imageLink>
+			</pageInfo>
+			<pageContent>
+				<p>
+					<wd pos="0,0,0,0" />
+				</p>
+			</pageContent>
+		</page>
+		<page type="bodypage" firstPage="No">
+			<pageInfo>
+				<pageID>00100</pageID>
+				<ocr>0.00</ocr>
+				<imageLink pageIndicator="single" width="1402" height="2306"
+					type="jpeg" colorimage="color">
+					eapb_mon_14501A_033_00100
+				</imageLink>
+			</pageInfo>
+			<pageContent>
+				<p>
+					<wd pos="0,0,0,0" />
+				</p>
+			</pageContent>
+		</page>
+		<page type="bodypage" firstPage="No">
+			<pageInfo>
+				<pageID>00110</pageID>
+				<ocr>0.00</ocr>
+				<imageLink pageIndicator="single" width="1402" height="2306"
+					type="jpeg" colorimage="color">
+					eapb_mon_14501A_033_00110
+				</imageLink>
+			</pageInfo>
+			<pageContent>
+				<p>
+					<wd pos="0,0,0,0" />
+				</p>
+			</pageContent>
+		</page>
+		<page type="bodypage" firstPage="No">
+			<pageInfo>
+				<pageID>00120</pageID>
+				<ocr>0.00</ocr>
+				<imageLink pageIndicator="single" width="1402" height="2306"
+					type="jpeg" colorimage="color">
+					eapb_mon_14501A_033_00120
+				</imageLink>
+			</pageInfo>
+			<pageContent>
+				<p>
+					<wd pos="0,0,0,0" />
+				</p>
+			</pageContent>
+		</page>
+		<page type="bodypage" firstPage="No">
+			<pageInfo>
+				<pageID>00130</pageID>
+				<ocr>0.00</ocr>
+				<imageLink pageIndicator="single" width="1402" height="2306"
+					type="jpeg" colorimage="color">
+					eapb_mon_14501A_033_00130
+				</imageLink>
+			</pageInfo>
+			<pageContent>
+				<p>
+					<wd pos="0,0,0,0" />
+				</p>
+			</pageContent>
+		</page>
+		<page type="bodypage" firstPage="No">
+			<pageInfo>
+				<pageID>00140</pageID>
+				<ocr>0.00</ocr>
+				<imageLink pageIndicator="single" width="1402" height="2306"
+					type="jpeg" colorimage="color">
+					eapb_mon_14501A_033_00140
+				</imageLink>
+			</pageInfo>
+			<pageContent>
+				<p>
+					<wd pos="0,0,0,0" />
+				</p>
+			</pageContent>
+		</page>
+		<page type="bodypage" firstPage="No">
+			<pageInfo>
+				<pageID>00150</pageID>
+				<ocr>0.00</ocr>
+				<imageLink pageIndicator="single" width="1402" height="2306"
+					type="jpeg" colorimage="color">
+					eapb_mon_14501A_033_00150
+				</imageLink>
+			</pageInfo>
+			<pageContent>
+				<p>
+					<wd pos="0,0,0,0" />
+				</p>
+			</pageContent>
+		</page>
+		<page type="bodypage" firstPage="No">
+			<pageInfo>
+				<pageID>00160</pageID>
+				<ocr>0.00</ocr>
+				<imageLink pageIndicator="single" width="1402" height="2306"
+					type="jpeg" colorimage="color">
+					eapb_mon_14501A_033_00160
+				</imageLink>
+			</pageInfo>
+			<pageContent>
+				<p>
+					<wd pos="0,0,0,0" />
+				</p>
+			</pageContent>
+		</page>
+		<page type="bodypage" firstPage="No">
+			<pageInfo>
+				<pageID>00170</pageID>
+				<ocr>0.00</ocr>
+				<imageLink pageIndicator="single" width="1402" height="2306"
+					type="jpeg" colorimage="color">
+					eapb_mon_14501A_033_00170
+				</imageLink>
+			</pageInfo>
+			<pageContent>
+				<p>
+					<wd pos="0,0,0,0" />
+				</p>
+			</pageContent>
+		</page>
+		<page type="bodypage" firstPage="No">
+			<pageInfo>
+				<pageID>00180</pageID>
+				<ocr>0.00</ocr>
+				<imageLink pageIndicator="single" width="1402" height="2306"
+					type="jpeg" colorimage="color">
+					eapb_mon_14501A_033_00180
+				</imageLink>
+			</pageInfo>
+			<pageContent>
+				<p>
+					<wd pos="0,0,0,0" />
+				</p>
+			</pageContent>
+		</page>
+		<page type="bodypage" firstPage="No">
+			<pageInfo>
+				<pageID>00190</pageID>
+				<ocr>0.00</ocr>
+				<imageLink pageIndicator="single" width="1402" height="2306"
+					type="jpeg" colorimage="color">
+					eapb_mon_14501A_033_00190
+				</imageLink>
+			</pageInfo>
+			<pageContent>
+				<p>
+					<wd pos="0,0,0,0" />
+				</p>
+			</pageContent>
+		</page>
+		<page type="bodypage" firstPage="No">
+			<pageInfo>
+				<pageID>00200</pageID>
+				<ocr>0.00</ocr>
+				<imageLink pageIndicator="single" width="1402" height="2306"
+					type="jpeg" colorimage="color">
+					eapb_mon_14501A_033_00200
+				</imageLink>
+			</pageInfo>
+			<pageContent>
+				<p>
+					<wd pos="0,0,0,0" />
+				</p>
+			</pageContent>
+		</page>
+		<page type="bodypage" firstPage="No">
+			<pageInfo>
+				<pageID>00210</pageID>
+				<ocr>0.00</ocr>
+				<imageLink pageIndicator="single" width="1402" height="2306"
+					type="jpeg" colorimage="color">
+					eapb_mon_14501A_033_00210
+				</imageLink>
+			</pageInfo>
+			<pageContent>
+				<p>
+					<wd pos="0,0,0,0" />
+				</p>
+			</pageContent>
+		</page>
+		<page type="bodypage" firstPage="No">
+			<pageInfo>
+				<pageID>00220</pageID>
+				<ocr>0.00</ocr>
+				<imageLink pageIndicator="single" width="1402" height="2306"
+					type="jpeg" colorimage="color">
+					eapb_mon_14501A_033_00220
+				</imageLink>
+			</pageInfo>
+			<pageContent>
+				<p>
+					<wd pos="0,0,0,0" />
+				</p>
+			</pageContent>
+		</page>
+		<page type="bodypage" firstPage="No">
+			<pageInfo>
+				<pageID>00230</pageID>
+				<ocr>0.00</ocr>
+				<imageLink pageIndicator="single" width="1402" height="2306"
+					type="jpeg" colorimage="color">
+					eapb_mon_14501A_033_00230
+				</imageLink>
+			</pageInfo>
+			<pageContent>
+				<p>
+					<wd pos="0,0,0,0" />
+				</p>
+			</pageContent>
+		</page>
+		<page type="bodypage" firstPage="No">
+			<pageInfo>
+				<pageID>00240</pageID>
+				<ocr>0.00</ocr>
+				<imageLink pageIndicator="single" width="1402" height="2306"
+					type="jpeg" colorimage="color">
+					eapb_mon_14501A_033_00240
+				</imageLink>
+			</pageInfo>
+			<pageContent>
+				<p>
+					<wd pos="0,0,0,0" />
+				</p>
+			</pageContent>
+		</page>
+		<page type="bodypage" firstPage="No">
+			<pageInfo>
+				<pageID>00250</pageID>
+				<ocr>0.00</ocr>
+				<imageLink pageIndicator="single" width="1402" height="2306"
+					type="jpeg" colorimage="color">
+					eapb_mon_14501A_033_00250
+				</imageLink>
+			</pageInfo>
+			<pageContent>
+				<p>
+					<wd pos="0,0,0,0" />
+				</p>
+			</pageContent>
+		</page>
+		<page type="bodypage" firstPage="No">
+			<pageInfo>
+				<pageID>00260</pageID>
+				<ocr>0.00</ocr>
+				<imageLink pageIndicator="single" width="1402" height="2306"
+					type="jpeg" colorimage="color">
+					eapb_mon_14501A_033_00260
+				</imageLink>
+			</pageInfo>
+			<pageContent>
+				<p>
+					<wd pos="0,0,0,0" />
+				</p>
+			</pageContent>
+		</page>
+	</text>
+</book>

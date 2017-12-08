@@ -1,0 +1,7 @@
+version: '3'
+
+services:
+  xqa-ingest-balancer:
+    build: .
+    image: "xqa-ingest-balancer"
+    network_mode: "host"

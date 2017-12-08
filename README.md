@@ -1,29 +1,22 @@
-# xqa-shard-JMS [![travis](https://travis-ci.org/jameshnsears/xqa-shard-JMS.svg?branch=master)](https://travis-ci.org/jameshnsears/xqa-shard-JMS.svg?branch=master) [![Coverage Status](https://coveralls.io/repos/github/jameshnsears/xqa-shard-JMS/badge.svg?branch=master)](https://coveralls.io/github/jameshnsears/xqa-shard-JMS?branch=master)
-an embedded in-memory BaseX instance with a JMS interface.
+# xqa-ingest-balancer [![Build Status](https://travis-ci.org/jameshnsears/xqa-ingest-balancer.svg?branch=master)](https://travis-ci.org/jameshnsears/xqa-ingest-balancer) [![Coverage Status](https://coveralls.io/repos/github/jameshnsears/xqa-ingest-balancer/badge.svg?branch=master)](https://coveralls.io/github/jameshnsears/xqa-ingest-balancer?branch=master)
+* evenly distributes the ingested XML across one or more shards.
 
 ## 1. High Level Design
-![High Level Design](uml/balancer-sequence-diagram.jpg)
+![High Level Design](https://github.com/jameshnsears/xqa-documentation/blob/master/uml/balancer-sequence-diagram.jpg)
 
 ## 2. Maven
 ### 2.1. Clean .m2
 * rm -rf $HOME/.m2/*
 
 ### 2.2. Test
-* mvn clean test
-* mvn -Ptest-integration-messagebroker test
-* mvn -Ptest-integration-storage test
+* mvn clean compile test
 * mvn jacoco:report coveralls:report
 
 ### 2.3. Package
-* mvn clean package -DskipTests
+* mvn package -DskipTests
 
 ### 2.4. Run
-* export JMS_Q_DEST=XXX
-* mvn spring-boot:run --jms.queue.xqa.ingest=${JMS_Q_DEST}
-
-or
-
-* java -jar target/xqa-shard-1.0.0-SNAPSHOT.jar --jms.queue.xqa.ingest=${JMS_Q_DEST}
+* java -jar target/xqa-ingest-balancer-1.0.0-SNAPSHOT-jar-with-dependencies.jar
 
 ## 3. Docker
 ### 3.1. Build locally
