@@ -1,0 +1,13 @@
+/bin/
+.idea/
+.pydevproject
+/target/
+xqa-shard.iml
+.vscode/
+
+__pycache__/
+coverage/
+.cache/
+.coverage
+.pydevproject
+.vscode/
