@@ -48,7 +48,13 @@ class InserterThread extends Thread {
             System.exit(1);
         } finally {
             synchronized(this) {
-                logger.info(MessageFormat.format("sha256={0}: END", sha256));
+                try {
+                    logger.info(MessageFormat.format("correlation_id={0}; sha256={1}: END", ingestMessage.getJMSCorrelationID(), sha256));
+                } catch (Exception exception) {
+                    logger.error(exception.getMessage());
+                    exception.printStackTrace();
+                    System.exit(1);
+                }
             }
         }
     }
