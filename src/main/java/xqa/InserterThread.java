@@ -34,7 +34,8 @@ class InserterThread extends Thread {
         try {
             synchronized(this) {
                 sha256 = DigestUtils.sha256Hex(MessageLogging.getTextFromMessage(ingestMessage));
-                logger.info(MessageFormat.format("correlation_id={0}; sha256={1}: START", ingestMessage.getJMSCorrelationID(), sha256));
+                String s = MessageFormat.format("\"correlation_id\":\"{0}\", \"sha256\":\"{1}\", \"state\":\"S\"", ingestMessage.getJMSCorrelationID(), sha256);
+                logger.info("{" + s + "}");
             }
 
             size();
@@ -49,7 +50,8 @@ class InserterThread extends Thread {
         } finally {
             synchronized(this) {
                 try {
-                    logger.info(MessageFormat.format("correlation_id={0}; sha256={1}: END", ingestMessage.getJMSCorrelationID(), sha256));
+                    String s = MessageFormat.format("\"correlation_id\":\"{0}\", \"sha256\":\"{1}\", \"state\":\"E\"", ingestMessage.getJMSCorrelationID(), sha256);
+                    logger.info("{" + s + "}");
                 } catch (Exception exception) {
                     logger.error(exception.getMessage());
                     exception.printStackTrace();
