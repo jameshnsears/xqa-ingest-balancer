@@ -31,9 +31,11 @@ class InserterThread extends Thread {
 
     public void run() {
         String sha256 = "";
+        String text;
         try {
             synchronized(this) {
-                sha256 = DigestUtils.sha256Hex(MessageLogging.getTextFromMessage(ingestMessage));
+                text = MessageLogging.getTextFromMessage(ingestMessage);
+                sha256 = DigestUtils.sha256Hex(text);
                 String s = MessageFormat.format("\"correlation_id\":\"{0}\", \"sha256\":\"{1}\", \"state\":\"S\"", ingestMessage.getJMSCorrelationID(), sha256);
                 logger.info("{" + s + "}");
             }
@@ -41,7 +43,7 @@ class InserterThread extends Thread {
             size();
             Message smallestShard = smallestShard();
             if (smallestShard != null) {
-                insert(smallestShard);
+                insert(smallestShard, text);
             }
         } catch (Exception exception) {
             logger.error(exception.getMessage());
@@ -141,30 +143,28 @@ class InserterThread extends Thread {
         return smallestShard;
     }
 
-    private void insert(Message smallestShard) throws JMSException, UnsupportedEncodingException, NamingException {
+    private void insert(Message smallestShard, String text) throws JMSException, UnsupportedEncodingException, NamingException {
         String correlationID;
-        String text;
         synchronized (this) {
             correlationID = this.ingestMessage.getJMSCorrelationID();
-            text = MessageLogging.getTextFromMessage(this.ingestMessage);
         }
 
         MessageSender messageSender = new MessageSender();
         messageSender.sendMessage(MessageSender.DestinationType.Queue, smallestShard.getJMSReplyTo().toString(), correlationID, null, text, DeliveryMode.PERSISTENT, true);
     }
-    
-    public String toString() {
-        String r = "";
-        synchronized (this) {
-            try {
-                r = (MessageFormat.format("{0}: sha256={1}", ingestMessage.getJMSCorrelationID(),
-                        DigestUtils.sha256Hex(MessageLogging.getTextFromMessage(ingestMessage))));
-            } catch (UnsupportedEncodingException | JMSException exception) {
-                logger.error(exception.getMessage());
-                exception.printStackTrace();
-                System.exit(1);
-            }
-        }
-        return r;
-    }
+
+//    public String toString() {
+//        String r = "";
+//        synchronized (this) {
+//            try {
+//                r = (MessageFormat.format("{0}: sha256={1}", ingestMessage.getJMSCorrelationID(),
+//                        DigestUtils.sha256Hex(MessageLogging.getTextFromMessage(ingestMessage))));
+//            } catch (UnsupportedEncodingException | JMSException exception) {
+//                logger.error(exception.getMessage());
+//                exception.printStackTrace();
+//                System.exit(1);
+//            }
+//        }
+//        return r;
+//    }
 }
