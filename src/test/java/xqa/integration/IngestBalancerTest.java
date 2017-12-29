@@ -32,7 +32,7 @@ class IngestBalancerTest {
             Thread.sleep(1000);
         }
 
-        assertEquals("42525eca22c83d83a3c562c3a491691bc774573fbf14b4afd52c2eae99c62b40", mockShard.digestOfMostRecentMessage);
+        assertEquals("192a0c3918e308c1374d57256b183045393c1cf9053a8614e9d7bb24b8261358", mockShard.digestOfMostRecentMessage);
 
         messageSender.sendMessage(MessageSender.DestinationType.Topic, "xqa.cmd.stop", UUID.randomUUID().toString(), null, null, DeliveryMode.PERSISTENT, false);
         mockShard.join();
@@ -40,7 +40,7 @@ class IngestBalancerTest {
     }
 
     private String xmlFileContents() throws IOException {
-        URL url = getClass().getResource("/test-data/eapb_mon_14501A_033.xml");
+        URL url = getClass().getResource("/test-data/nicn_nwp_078_17101111_0195.xml");
         return FileUtils.readFileToString(new File(url.getPath()), "UTF-8");
     }
 }

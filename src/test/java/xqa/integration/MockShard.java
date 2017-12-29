@@ -84,6 +84,7 @@ class MockShard extends Thread implements Runnable, MessageListener {
                     break;
                 }
 
+                // insert
                 default:
                     logger.debug(MessageLogging.log(MessageLogging.Direction.RECEIVE, message, true));
                     synchronized (this) {
