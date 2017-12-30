@@ -20,7 +20,7 @@
 
 ## 3. Docker
 ### 3.1. Build locally
-* docker-compose -p "dev" build
+* docker-compose -p "dev" build --force-rm
 
 or
 

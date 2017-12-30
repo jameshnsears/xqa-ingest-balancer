@@ -152,19 +152,4 @@ class InserterThread extends Thread {
         MessageSender messageSender = new MessageSender();
         messageSender.sendMessage(MessageSender.DestinationType.Queue, smallestShard.getJMSReplyTo().toString(), correlationID, null, text, DeliveryMode.PERSISTENT, true);
     }
-
-//    public String toString() {
-//        String r = "";
-//        synchronized (this) {
-//            try {
-//                r = (MessageFormat.format("{0}: sha256={1}", ingestMessage.getJMSCorrelationID(),
-//                        DigestUtils.sha256Hex(MessageLogging.getTextFromMessage(ingestMessage))));
-//            } catch (UnsupportedEncodingException | JMSException exception) {
-//                logger.error(exception.getMessage());
-//                exception.printStackTrace();
-//                System.exit(1);
-//            }
-//        }
-//        return r;
-//    }
 }
