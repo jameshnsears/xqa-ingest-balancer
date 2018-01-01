@@ -8,7 +8,7 @@
 ### 2.1. Clean .m2
 * rm -rf $HOME/.m2/*
 
-### 2.2. Test
+### 2.2. Test - needs xqa-manager to be running!
 * mvn clean compile test
 * mvn jacoco:report coveralls:report
 
