@@ -34,26 +34,7 @@ import java.util.Set;
 public class JmsTestMessageFacade implements JmsMessageFacade {
 
     private static final Charset UTF8 = Charset.forName("UTF-8");
-
-    public static enum JmsMsgType {
-        MESSAGE("jms/message"),
-        BYTES("jms/bytes-message"),
-        MAP("jms/map-message"),
-        OBJECT("jms/object-message"),
-        STREAM("jms/stream-message"),
-        TEXT("jms/text-message"),
-        TEXT_NULL("jms/text-message-null");
-
-        public final String buffer = new String(this.name());
-        public final String mime;
-
-        JmsMsgType(String mime) {
-            this.mime = mime;
-        }
-    }
-
     protected Map<String, Object> properties = new HashMap<String, Object>();
-
     protected int priority = javax.jms.Message.DEFAULT_PRIORITY;
     protected String groupId;
     protected int groupSequence;
@@ -372,5 +353,22 @@ public class JmsTestMessageFacade implements JmsMessageFacade {
     @Override
     public Object encodeMessage() {
         return this;
+    }
+
+    public static enum JmsMsgType {
+        MESSAGE("jms/message"),
+        BYTES("jms/bytes-message"),
+        MAP("jms/map-message"),
+        OBJECT("jms/object-message"),
+        STREAM("jms/stream-message"),
+        TEXT("jms/text-message"),
+        TEXT_NULL("jms/text-message-null");
+
+        public final String buffer = new String(this.name());
+        public final String mime;
+
+        JmsMsgType(String mime) {
+            this.mime = mime;
+        }
     }
 }

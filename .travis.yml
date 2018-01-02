@@ -11,21 +11,17 @@ services:
 jdk:
   - oraclejdk8
 
-before_install:
-  - docker volume create xqa-message-broker
-  - docker pull jameshnsears/xqa-message-broker
-  - docker run -d --net="host" --name="xqa-message-broker" -p 127.0.0.1:5672:5672 jameshnsears/xqa-message-broker
-  - sleep 10
-  - docker logs xqa-message-broker
-  - mvn install -DskipTests=true -Dmaven.javadoc.skip=true -B -V
-
 cache:
   directories:
   - $HOME/.m2
+
+before_script:
+  - docker-compose -p "dev" up -d xqa-message-broker
+
+  - mvn install -DskipTests=true -Dmaven.javadoc.skip=true -B -V
 
 script:
   - mvn clean test
  
 after_success:
   - mvn jacoco:report coveralls:report
-  - bash <(curl -s https://codecov.io/bash) -t 8e0fac09-e382-472c-92a4-c8831a22b786

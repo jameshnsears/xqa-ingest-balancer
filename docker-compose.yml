@@ -4,4 +4,24 @@ services:
   xqa-ingest-balancer:
     build: .
     image: "xqa-ingest-balancer"
-    network_mode: "host"
+    command: ["-message_broker_host", "xqa-message-broker", "-pool_size", "4"]
+    depends_on:
+      - xqa-message-broker
+    networks:
+      - xqa
+
+  xqa-message-broker:
+    image: jameshnsears/xqa-message-broker
+    ports:
+      - "5672:5672"
+      - "8161:8161"
+    volumes:
+      - "xqa-message-broker:/opt/apache-activemq-5.15.3/data"
+    networks:
+      - xqa
+
+volumes:
+  xqa-message-broker:
+
+networks:
+  xqa:

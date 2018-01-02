@@ -1,4 +1,4 @@
-FROM debian:latest
+FROM debian:stretch
 
 MAINTAINER james.hn.sears@gmail.com
 
@@ -14,7 +14,7 @@ ENV LC_ALL en_GB.UTF-8
 RUN dpkg-reconfigure --frontend noninteractive locales
 
 ARG OPTDIR=/opt
-ARG XQA=/xqa-shard
+ARG XQA=/xqa-ingest-balancer
 
 RUN mkdir -p ${OPTDIR}${XQA}
 COPY target/xqa-ingest-balancer-1.0.0-SNAPSHOT-jar-with-dependencies.jar ${OPTDIR}${XQA}

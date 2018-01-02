@@ -4,20 +4,23 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.qpid.jms.message.JmsBytesMessage;
 import org.apache.qpid.jms.message.JmsObjectMessage;
 import org.apache.qpid.jms.message.JmsTextMessage;
+import org.apache.qpid.jms.message.facade.JmsMessageFacade;
+import org.apache.qpid.jms.provider.amqp.message.AmqpJmsBytesMessageFacade;
+import org.apache.qpid.jms.provider.amqp.message.AmqpJmsObjectMessageFacade;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.jms.Destination;
-import javax.jms.JMSException;
 import javax.jms.Message;
 import java.io.Serializable;
-import java.io.UnsupportedEncodingException;
 import java.text.MessageFormat;
 
 public class MessageLogging {
     private static final Logger logger = LoggerFactory.getLogger(MessageLogging.class);
-    
-    public static String log(Direction direction, Message message, boolean useDigest) throws JMSException, UnsupportedEncodingException {
+
+    public static String log(Direction direction,
+                             Message message,
+                             boolean useDigest) throws Exception {
         String arrowDirection = getArrow(direction);
         String jmsTimestamp = Long.toString(message.getJMSTimestamp());
         String jmsCorrelationID = message.getJMSCorrelationID();
@@ -25,11 +28,32 @@ public class MessageLogging {
         Destination jmsReplyTo = message.getJMSReplyTo();
         long jmsExpiration = message.getJMSExpiration();
         String text = getTextFromMessage(message);
+        String subject = getSubject(message);
 
-        return formmatedLog(arrowDirection, jmsTimestamp, jmsCorrelationID, jmsDestination, jmsReplyTo, jmsExpiration, text, useDigest);
+        return formmatedLog(arrowDirection, jmsTimestamp, jmsCorrelationID, jmsDestination, jmsReplyTo, subject,
+                jmsExpiration, text, useDigest);
     }
 
-    public static String getTextFromMessage(Message message) throws JMSException, UnsupportedEncodingException {
+    private static String getSubject(Message message) {
+        if (message instanceof JmsBytesMessage) {
+            logger.debug("JmsBytesMessage");
+            JmsBytesMessage jmsBytesMessage = (JmsBytesMessage) message;
+            AmqpJmsBytesMessageFacade facade = (AmqpJmsBytesMessageFacade) jmsBytesMessage.getFacade();
+            return facade.getType();
+        } else if (message instanceof JmsObjectMessage) {
+            logger.debug("JmsObjectMessage");
+            JmsObjectMessage jmsObjectMessage = (JmsObjectMessage) message;
+            AmqpJmsObjectMessageFacade facade = (AmqpJmsObjectMessageFacade) jmsObjectMessage.getFacade();
+            return facade.getType();
+        } else {
+            logger.debug("JmsTextMessage");
+            JmsTextMessage jmsTextMessage = (JmsTextMessage) message;
+            JmsMessageFacade facade = jmsTextMessage.getFacade();
+            return facade.getType();
+        }
+    }
+
+    public static String getTextFromMessage(Message message) throws Exception {
         if (message instanceof JmsBytesMessage) {
             logger.debug("JmsBytesMessage");
             JmsBytesMessage jmsBytesMessage = (JmsBytesMessage) message;
@@ -42,34 +66,37 @@ public class MessageLogging {
             logger.debug("JmsObjectMessage");
             JmsObjectMessage jmsObjectMessage = (JmsObjectMessage) message;
             Serializable serializable = jmsObjectMessage.getObject();
-            return new String(serializable.toString().getBytes(),"UTF-8");
+            return new String(serializable.toString().getBytes(), "UTF-8");
         } else {
-            logger.debug("JmsTextMessage"); 
+            logger.debug("JmsTextMessage");
             JmsTextMessage jmsTextMessage = (JmsTextMessage) message;
-            return new String(jmsTextMessage.getText().getBytes(),"UTF-8");
+            return new String(jmsTextMessage.getText().getBytes(), "UTF-8");
         }
     }
 
-    private static String formmatedLog(String arrowDirection, String jmsTimestamp, String jmsCorrelationID, Destination jmsDestination, Destination jmsReplyTo, long jmsExpiration, String text, boolean useDigest) {
+    private static String formmatedLog(String arrowDirection,
+                                       String jmsTimestamp,
+                                       String jmsCorrelationID,
+                                       Destination jmsDestination,
+                                       Destination jmsReplyTo,
+                                       String subject,
+                                       long jmsExpiration,
+                                       String text,
+                                       boolean useDigest) {
         String commonLogString = MessageFormat.format(
-                "{0} jmsTimestamp={1}; jmsCorrelationID={2}; jmsDestination={3}; jmsReplyTo={4}; jmsExpiration={5}",
-                arrowDirection,
-                jmsTimestamp,
-                jmsCorrelationID,
-                jmsDestination,
-                jmsReplyTo,
-                jmsExpiration);
+                "{0} jmsTimestamp={1}; jmsDestination={2}; jmsCorrelationID={3}; jmsReplyTo={4}; subject={5}; jmsExpiration={6}",
+                arrowDirection, jmsTimestamp, jmsDestination, jmsCorrelationID, jmsReplyTo, subject, jmsExpiration);
 
-        String testLogString = "";
+        String textLogString = "";
         if (useDigest) {
-            testLogString = MessageFormat.format("; sha256(text)={0}", DigestUtils.sha256Hex(text));
+            textLogString = MessageFormat.format("; digest(text)={0}", DigestUtils.sha256Hex(text));
         } else {
             if (text != null && !text.equals("")) {
-                testLogString = MessageFormat.format("; text={0}", text);
+                textLogString = MessageFormat.format("; text={0}", text);
             }
         }
 
-        return commonLogString.concat(testLogString);
+        return commonLogString.concat(textLogString);
     }
 
     private static String getArrow(Direction direction) {

@@ -4,14 +4,11 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.qpid.jms.message.JmsBytesMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import xqa.commons.IngestBalancerConnectionFactory;
 import xqa.commons.MessageLogging;
 import xqa.commons.MessageSender;
 
 import javax.jms.*;
-import javax.naming.Context;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
-import java.io.UnsupportedEncodingException;
 import java.util.UUID;
 
 class MockShard extends Thread implements Runnable, MessageListener {
@@ -40,8 +37,8 @@ class MockShard extends Thread implements Runnable, MessageListener {
 
     private void registerListeners() {
         try {
-            Context context = new InitialContext();
-            ConnectionFactory factory = (ConnectionFactory) context.lookup("url.amqp");
+            ConnectionFactory factory = IngestBalancerConnectionFactory.messageBroker("127.0.0.1");
+
             Connection connection = factory.createConnection("admin", "admin");
             connection.start();
 
@@ -100,12 +97,13 @@ class MockShard extends Thread implements Runnable, MessageListener {
         }
     }
 
-    private void sendSizeReply(JmsBytesMessage jmsBytesMessage) throws JMSException, UnsupportedEncodingException, NamingException {
-        MessageSender messageSender = new MessageSender();
+    private void sendSizeReply(JmsBytesMessage jmsBytesMessage) throws Exception {
+        MessageSender messageSender = new MessageSender("127.0.0.1");
         Destination insertDestination;
         synchronized (this) {
             insertDestination = this.insertUuidDestination;
             messageSender.sendReplyMessage(jmsBytesMessage.getJMSReplyTo(), jmsBytesMessage.getJMSCorrelationID(), insertDestination, "0", DeliveryMode.NON_PERSISTENT);
         }
+        messageSender.close();
     }
 }

@@ -4,11 +4,12 @@
 .coverage
 coverage/
 .idea/*
-.xqa.vpp.*
 *.iml
 *.pyc
 __pycache__/
 .pydevproject
+tags
 /target/
-.vscode/
 venv/
+.vscode/
+.xqa.vpp.*
