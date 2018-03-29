@@ -11,7 +11,7 @@ services:
       - xqa
 
   xqa-message-broker:
-    image: jameshnsears/xqa-message-broker
+    image: jameshnsears/xqa-message-broker:latest
     ports:
       - "5672:5672"
       - "8161:8161"
