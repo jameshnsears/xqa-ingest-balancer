@@ -62,6 +62,12 @@
 		</dependency>
 
 		<dependency>
+			<groupId>com.github.jameshnsears</groupId>
+			<artifactId>xqa-commons-qpid-jms</artifactId>
+			<version>1.0</version>
+		</dependency>
+
+		<dependency>
 			<groupId>org.junit.platform</groupId>
 			<artifactId>junit-platform-launcher</artifactId>
 			<version>1.0.3</version>

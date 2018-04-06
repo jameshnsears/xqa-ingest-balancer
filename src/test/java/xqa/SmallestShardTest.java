@@ -4,7 +4,6 @@ import org.apache.qpid.jms.message.JmsBytesMessage;
 import org.apache.qpid.jms.message.JmsMessageFactory;
 import org.apache.qpid.jms.message.facade.test.JmsTestMessageFactory;
 import org.junit.jupiter.api.Test;
-import xqa.commons.InserterThread;
 import xqa.commons.MessageLogging;
 
 import javax.jms.BytesMessage;

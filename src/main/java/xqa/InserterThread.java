@@ -1,4 +1,4 @@
-package xqa.commons;
+package xqa;
 
 import java.text.MessageFormat;
 import java.util.UUID;
@@ -21,7 +21,9 @@ import org.slf4j.LoggerFactory;
 
 import com.google.gson.Gson;
 
-import xqa.IngestBalancer;
+import xqa.commons.IngestBalancerConnectionFactory;
+import xqa.commons.MessageLogging;
+import xqa.commons.MessageSender;
 
 public class InserterThread extends Thread {
     private static final Logger logger = LoggerFactory.getLogger(IngestBalancer.class);

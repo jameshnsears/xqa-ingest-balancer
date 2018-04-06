@@ -6,7 +6,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sun.misc.Signal;
 import xqa.commons.IngestBalancerConnectionFactory;
-import xqa.commons.InserterThread;
 import xqa.commons.MessageLogging;
 
 import javax.jms.*;

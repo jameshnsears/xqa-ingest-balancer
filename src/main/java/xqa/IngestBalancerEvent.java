@@ -1,4 +1,4 @@
-package xqa.commons;
+package xqa;
 
 import java.util.Date;
 
