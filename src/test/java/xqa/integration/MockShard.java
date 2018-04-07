@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import xqa.commons.IngestBalancerConnectionFactory;
 import xqa.commons.MessageSender;
+import xqa.commons.qpid.jms.MessageBroker;
 import xqa.commons.qpid.jms.MessageLogger;
 import xqa.commons.qpid.jms.MessageMaker;
 
@@ -18,7 +19,11 @@ class MockShard extends Thread implements Runnable, MessageListener {
     private boolean stop = false;
     private Destination insertUuidDestination;
 
-    public MockShard() {
+    MessageBroker messageBroker;
+
+    public MockShard() throws MessageBroker.MessageBrokerException {
+        messageBroker = new MessageBroker("0.0.0.0", 5672, "admin", "admin", 3);
+
         setName("MockShard");
     }
 
@@ -34,29 +39,31 @@ class MockShard extends Thread implements Runnable, MessageListener {
                 System.exit(1);
             }
         }
+
+        try {
+            messageBroker.close();
+        } catch (Exception exception) {
+            logger.error(exception.getMessage());
+            exception.printStackTrace();
+            System.exit(1);
+        }
     }
 
     private void registerListeners() {
         try {
-            ConnectionFactory factory = IngestBalancerConnectionFactory.messageBroker("127.0.0.1");
 
-            Connection connection = factory.createConnection("admin", "admin");
-            connection.start();
-
-            Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-
-            Destination cmdStopDestination = session.createTopic("xqa.cmd.stop");
-            MessageConsumer cmdStopConsumer = session.createConsumer(cmdStopDestination);
+            Destination cmdStopDestination = messageBroker.getSession().createTopic("xqa.cmd.stop");
+            MessageConsumer cmdStopConsumer = messageBroker.getSession().createConsumer(cmdStopDestination);
             cmdStopConsumer.setMessageListener(this);
 
-            Destination sizeDestination = session.createTopic("xqa.shard.size");
-            MessageConsumer sizeConsumer = session.createConsumer(sizeDestination);
+            Destination sizeDestination = messageBroker.getSession().createTopic("xqa.shard.size");
+            MessageConsumer sizeConsumer = messageBroker.getSession().createConsumer(sizeDestination);
             sizeConsumer.setMessageListener(this);
 
             String uuid = UUID.randomUUID().toString().split("-")[0];
             synchronized (this) {
-                insertUuidDestination = session.createQueue("xqa.shard.insert.".concat(uuid));
-                MessageConsumer insertUuidConsumer = session.createConsumer(insertUuidDestination);
+                insertUuidDestination = messageBroker.getSession().createQueue("xqa.shard.insert.".concat(uuid));
+                MessageConsumer insertUuidConsumer = messageBroker.getSession().createConsumer(insertUuidDestination);
                 insertUuidConsumer.setMessageListener(this);
             }
         } catch (Exception exception) {
@@ -68,28 +75,19 @@ class MockShard extends Thread implements Runnable, MessageListener {
 
     public void onMessage(Message message) {
         try {
-            JmsBytesMessage jmsBytesMessage = (JmsBytesMessage) message;
-            switch (jmsBytesMessage.getJMSDestination().toString()) {
-                case "xqa.cmd.stop": {
-                    logger.debug(MessageLogger.log(MessageLogger.Direction.RECEIVE, message, false));
-                    stop = true;
-                    break;
+            if (message.getJMSDestination().toString().equals("xqa.cmd.stop")) {
+                logger.debug(MessageLogger.log(MessageLogger.Direction.RECEIVE, message, false));
+                stop = true;
+            }
+            else if (message.getJMSDestination().toString().equals("xqa.shard.size")) {
+                logger.debug(MessageLogger.log(MessageLogger.Direction.RECEIVE, message, false));
+                sendSizeReply(message);
+            }
+            else {
+                logger.debug(MessageLogger.log(MessageLogger.Direction.RECEIVE, message, true));
+                synchronized (this) {
+                    digestOfMostRecentMessage = DigestUtils.sha256Hex(MessageMaker.getBody(message));
                 }
-
-                case "xqa.shard.size": {
-                    logger.debug(MessageLogger.log(MessageLogger.Direction.RECEIVE, message, false));
-                    sendSizeReply(jmsBytesMessage);
-                    break;
-                }
-
-                // insert
-                default:
-                    logger.debug(MessageLogger.log(MessageLogger.Direction.RECEIVE, message, true));
-                    synchronized (this) {
-                        digestOfMostRecentMessage = DigestUtils.sha256Hex(MessageMaker.getBody(message));
-
-                    }
-                    break;
             }
 
         } catch (Exception exception) {
@@ -99,13 +97,14 @@ class MockShard extends Thread implements Runnable, MessageListener {
         }
     }
 
-    private void sendSizeReply(JmsBytesMessage jmsBytesMessage) throws Exception {
-        MessageSender messageSender = new MessageSender("127.0.0.1");
-        Destination insertDestination;
-        synchronized (this) {
-            insertDestination = this.insertUuidDestination;
-            messageSender.sendReplyMessage(jmsBytesMessage.getJMSReplyTo(), jmsBytesMessage.getJMSCorrelationID(), insertDestination, "0", DeliveryMode.NON_PERSISTENT);
-        }
-        messageSender.close();
+    private void sendSizeReply(Message jmsBytesMessage) throws Exception {
+        Message message = MessageMaker.createMessage(
+                messageBroker.getSession(),
+                jmsBytesMessage.getJMSReplyTo(),
+                this.insertUuidDestination,
+                jmsBytesMessage.getJMSCorrelationID(),
+                "0");
+
+        messageBroker.sendMessage(message);
     }
 }
