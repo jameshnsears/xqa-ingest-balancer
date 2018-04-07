@@ -5,11 +5,13 @@ import org.apache.commons.cli.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sun.misc.Signal;
-import xqa.commons.IngestBalancerConnectionFactory;
-import xqa.commons.MessageLogging;
 import xqa.commons.qpid.jms.MessageBroker;
+import xqa.commons.qpid.jms.MessageLogger;
 
-import javax.jms.*;
+import javax.jms.Destination;
+import javax.jms.Message;
+import javax.jms.MessageConsumer;
+import javax.jms.MessageListener;
 import java.util.UUID;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
@@ -18,20 +20,21 @@ import java.util.concurrent.ThreadPoolExecutor;
 
 public class IngestBalancer extends Thread implements MessageListener {
     private static final Logger logger = LoggerFactory.getLogger(IngestBalancer.class);
-    private final String serviceId;
+    public final String serviceId;
+
+    public MessageBroker messageBroker;
     public String messageBrokerHost;
-    private MessageBroker messageBroker;
     private int messageBrokerPort;
     private String messageBrokerUsername;
     private String messageBrokerPassword;
     private int messageBrokerRetryAttempts;
 
-    private String destinationIngest;
-    private String destinationEvent;
-    private String destinationShardSize;
-    private String destinationShardInsert;
+    public String destinationIngest;
+    public String destinationEvent;
+    public String destinationShardSize;
+    public String destinationCmdStop = "xqa.cmd.stop";
 
-    private int poolSize;
+    public int poolSize;
 
     private boolean stop = false;
     private ThreadPoolExecutor ingestPoolExecutor;
@@ -42,7 +45,7 @@ public class IngestBalancer extends Thread implements MessageListener {
         setName("IngestBalancer");
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws ParseException, InterruptedException, CommandLineException {
         Signal.handle(new Signal("INT"), signal -> System.exit(1));
 
         try {
@@ -50,12 +53,9 @@ public class IngestBalancer extends Thread implements MessageListener {
             ingestBalancer.processCommandLine(args);
             ingestBalancer.start();
             ingestBalancer.join();
-        } catch (CommandLineException exception) {
-            logger.debug(exception.getMessage());
         } catch (Exception exception) {
             logger.error(exception.getMessage());
-            exception.printStackTrace();
-            System.exit(1);
+            throw exception;
         }
     }
 
@@ -71,7 +71,6 @@ public class IngestBalancer extends Thread implements MessageListener {
         options.addOption("destination_ingest", true, "i.e. xqa.ingest");
         options.addOption("destination_event", true, "i.e. xqa.event");
         options.addOption("destination_shard_size", true, "i.e. xqa.shard.size");
-        options.addOption("destination_shard_insert", true, "i.e. xqa.shard.insert");
 
         options.addOption("pool_size", true, "i.e. 4");
 
@@ -93,9 +92,8 @@ public class IngestBalancer extends Thread implements MessageListener {
         messageBrokerRetryAttempts = Integer.parseInt(commandLine.getOptionValue("message_broker_retry", "3"));
 
         destinationIngest = commandLine.getOptionValue("destination_ingest", "xqa.ingest");
-        destinationEvent = commandLine.getOptionValue("destination_event", "xqa.db.event");
+        destinationEvent = commandLine.getOptionValue("destination_event", "xqa.event");
         destinationShardSize = commandLine.getOptionValue("destination_shard_size", "xqa.shard.size");
-        destinationShardInsert = commandLine.getOptionValue("destination_shard_insert", "xqa.shard.insert");
 
         poolSize = Integer.parseInt(commandLine.getOptionValue("pool_size", "1"));
     }
@@ -110,15 +108,14 @@ public class IngestBalancer extends Thread implements MessageListener {
         ThreadFactory threadFactory = new ThreadFactoryBuilder().setNameFormat("InserterThread-%d").setDaemon(true)
                 .build();
 
-        ingestPoolExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(Integer.valueOf(poolSize),
-                threadFactory);
+        ingestPoolExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(poolSize, threadFactory);
     }
 
     public void run() {
         try {
             initialiseIngestPool();
-
             registerListeners();
+
             while (!stop) {
                 Thread.sleep(500);
             }
@@ -132,36 +129,19 @@ public class IngestBalancer extends Thread implements MessageListener {
     }
 
     private void registerListeners() throws Exception {
-        ConnectionFactory factory = IngestBalancerConnectionFactory.messageBroker(messageBrokerHost);
+        messageBroker = new MessageBroker(
+                messageBrokerHost,
+                messageBrokerPort,
+                messageBrokerUsername,
+                messageBrokerPassword,
+                messageBrokerRetryAttempts);
 
-        Connection connection = null;
-
-        int retryAttempts = 3;
-        boolean connected = false;
-        while (connected == false) {
-            try {
-                connection = factory.createConnection("admin", "admin");
-                connected = true;
-            } catch (Exception exception) {
-                logger.warn("retryAttempts=" + retryAttempts);
-                if (retryAttempts == 0) {
-                    throw exception;
-                }
-                retryAttempts--;
-                Thread.sleep(5000);
-            }
-        }
-
-        connection.start();
-
-        Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-
-        Destination cmdStop = session.createTopic("xqa.cmd.stop");
-        MessageConsumer cmdStopConsumer = session.createConsumer(cmdStop);
+        Destination cmdStop = messageBroker.getSession().createTopic(destinationCmdStop);
+        MessageConsumer cmdStopConsumer = messageBroker.getSession().createConsumer(cmdStop);
         cmdStopConsumer.setMessageListener(this);
 
-        Destination ingest = session.createQueue("xqa.ingest");
-        MessageConsumer ingestConsumer = session.createConsumer(ingest);
+        Destination ingest = messageBroker.getSession().createQueue(destinationIngest);
+        MessageConsumer ingestConsumer = messageBroker.getSession().createConsumer(ingest);
         ingestConsumer.setMessageListener(this);
 
         logger.info("listeners registered");
@@ -169,18 +149,20 @@ public class IngestBalancer extends Thread implements MessageListener {
 
     public void onMessage(Message message) {
         try {
-            switch (message.getJMSDestination().toString()) {
-                case "xqa.cmd.stop": {
-                    logger.info(MessageLogging.log(MessageLogging.Direction.RECEIVE, message, false));
-                    stop = true;
-                    break;
-                }
+            if (message.getJMSDestination().toString().equals(destinationCmdStop)) {
+                logger.info(MessageLogger.log(MessageLogger.Direction.RECEIVE, message, false));
+                stop = true;
+            }
 
-                case "xqa.ingest": {
-                    logger.info(MessageLogging.log(MessageLogging.Direction.RECEIVE, message, true));
-                    ingestPoolExecutor.execute(new InserterThread(serviceId, messageBrokerHost, poolSize, message));
-                    break;
-                }
+            if (message.getJMSDestination().toString().equals(destinationIngest)) {
+                logger.info(MessageLogger.log(MessageLogger.Direction.RECEIVE, message, true));
+                ingestPoolExecutor.execute(new InserterThread(
+                        serviceId,
+                        messageBroker,
+                        message,
+                        poolSize,
+                        destinationEvent,
+                        destinationShardSize));
             }
         } catch (Exception exception) {
             logger.error(exception.getMessage());

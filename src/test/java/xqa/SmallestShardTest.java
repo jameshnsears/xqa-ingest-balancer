@@ -4,9 +4,13 @@ import org.apache.qpid.jms.message.JmsBytesMessage;
 import org.apache.qpid.jms.message.JmsMessageFactory;
 import org.apache.qpid.jms.message.facade.test.JmsTestMessageFactory;
 import org.junit.jupiter.api.Test;
-import xqa.commons.MessageLogging;
+import xqa.commons.qpid.jms.MessageMaker;
 
 import javax.jms.BytesMessage;
+import javax.jms.Message;
+
+import java.util.List;
+import java.util.Vector;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
@@ -14,22 +18,36 @@ import static org.mockito.Mockito.mock;
 class SmallestShardTest {
     @Test
     void findSmallestShard() throws Exception {
-        InserterThread inserter = new InserterThread(this.getClass().getSimpleName(), "127.0.0.1", 1, mock(BytesMessage.class));
+
+        IngestBalancer ingestBalancer = new IngestBalancer();
+        ingestBalancer.processCommandLine(new String[] {"-message_broker_host", "127.0.0.1"});
+
+        InserterThread inserterThread = new InserterThread(
+                ingestBalancer.serviceId,
+                ingestBalancer.messageBroker,
+                mock(BytesMessage.class),
+                ingestBalancer.poolSize,
+                ingestBalancer.destinationEvent,
+                ingestBalancer.destinationShardSize);
+
+        List<Message> shardSizeResponses = new Vector<>();
 
         JmsMessageFactory factory = new JmsTestMessageFactory();
 
         JmsBytesMessage big = factory.createBytesMessage();
         big.writeBytes("10".getBytes());
-        inserter.shardSizeResponses.add(big);
+        shardSizeResponses.add(big);
 
         JmsBytesMessage bigger = factory.createBytesMessage();
         bigger.writeBytes("30".getBytes());
-        inserter.shardSizeResponses.add(bigger);
+        shardSizeResponses.add(bigger);
 
         JmsBytesMessage smallest = factory.createBytesMessage();
         smallest.writeBytes("5".getBytes());
-        inserter.shardSizeResponses.add(smallest);
+        shardSizeResponses.add(smallest);
 
-        assertEquals(MessageLogging.getTextFromMessage(smallest), MessageLogging.getTextFromMessage(inserter.smallestShard()));
+        assertEquals(
+                MessageMaker.getBody(smallest),
+                MessageMaker.getBody(inserterThread.findSmallestShard(shardSizeResponses)));
     }
 }

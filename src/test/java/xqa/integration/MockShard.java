@@ -5,8 +5,9 @@ import org.apache.qpid.jms.message.JmsBytesMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import xqa.commons.IngestBalancerConnectionFactory;
-import xqa.commons.MessageLogging;
 import xqa.commons.MessageSender;
+import xqa.commons.qpid.jms.MessageLogger;
+import xqa.commons.qpid.jms.MessageMaker;
 
 import javax.jms.*;
 import java.util.UUID;
@@ -70,22 +71,23 @@ class MockShard extends Thread implements Runnable, MessageListener {
             JmsBytesMessage jmsBytesMessage = (JmsBytesMessage) message;
             switch (jmsBytesMessage.getJMSDestination().toString()) {
                 case "xqa.cmd.stop": {
-                    logger.debug(MessageLogging.log(MessageLogging.Direction.RECEIVE, message, false));
+                    logger.debug(MessageLogger.log(MessageLogger.Direction.RECEIVE, message, false));
                     stop = true;
                     break;
                 }
 
                 case "xqa.shard.size": {
-                    logger.debug(MessageLogging.log(MessageLogging.Direction.RECEIVE, message, false));
+                    logger.debug(MessageLogger.log(MessageLogger.Direction.RECEIVE, message, false));
                     sendSizeReply(jmsBytesMessage);
                     break;
                 }
 
                 // insert
                 default:
-                    logger.debug(MessageLogging.log(MessageLogging.Direction.RECEIVE, message, true));
+                    logger.debug(MessageLogger.log(MessageLogger.Direction.RECEIVE, message, true));
                     synchronized (this) {
-                        digestOfMostRecentMessage = DigestUtils.sha256Hex(MessageLogging.getTextFromMessage(message));
+                        digestOfMostRecentMessage = DigestUtils.sha256Hex(MessageMaker.getBody(message));
+
                     }
                     break;
             }
