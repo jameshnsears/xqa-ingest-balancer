@@ -22,12 +22,9 @@ class SmallestShardTest {
         ingestBalancer.processCommandLine(new String[]{"-message_broker_host", "127.0.0.1"});
 
         InserterThread inserterThread = new InserterThread(
-                ingestBalancer.serviceId,
+                ingestBalancer,
                 ingestBalancer.messageBroker,
-                mock(BytesMessage.class),
-                ingestBalancer.poolSize,
-                ingestBalancer.destinationEvent,
-                ingestBalancer.destinationShardSize);
+                mock(BytesMessage.class));
 
         List<Message> shardSizeResponses = new Vector<>();
 

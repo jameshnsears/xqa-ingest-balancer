@@ -15,12 +15,12 @@ import java.util.UUID;
 
 class MockShard extends Thread implements Runnable, MessageListener {
     private static final Logger logger = LoggerFactory.getLogger(MockShard.class);
-    public String digestOfMostRecentMessage;
-    private MessageBroker messageBroker;
-    private boolean stop = false;
     private final String destinationInsertRoot = "xqa.shard.insert.";
     private final String destinationShardSize = "xqa.shard.size";
     private final String destinationCmdStop = "xqa.cmd.stop";
+    public String digestOfMostRecentMessage;
+    private MessageBroker messageBroker;
+    private boolean stop = false;
     private Destination insertUuidDestination;
 
     public MockShard() throws MessageBroker.MessageBrokerException {

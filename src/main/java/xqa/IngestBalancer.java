@@ -23,16 +23,17 @@ public class IngestBalancer extends Thread implements MessageListener {
     public final String serviceId;
 
     public MessageBroker messageBroker;
-    private String messageBrokerHost;
+    public String messageBrokerHost;
     public String destinationIngest;
     public String destinationEvent;
     public String destinationShardSize;
     public final String destinationCmdStop = "xqa.cmd.stop";
     public int poolSize;
-    private int messageBrokerPort;
-    private String messageBrokerUsername;
-    private String messageBrokerPassword;
-    private int messageBrokerRetryAttempts;
+    public int messageBrokerPort;
+    public String messageBrokerUsername;
+    public String messageBrokerPassword;
+    public int messageBrokerRetryAttempts;
+    public int insertThreadWait;
     private boolean stop = false;
     private ThreadPoolExecutor ingestPoolExecutor;
 
@@ -69,6 +70,8 @@ public class IngestBalancer extends Thread implements MessageListener {
         options.addOption("destination_event", true, "i.e. xqa.event");
         options.addOption("destination_shard_size", true, "i.e. xqa.shard.size");
 
+        options.addOption("insert_thread_wait", true, "i.e. 60000");
+
         options.addOption("pool_size", true, "i.e. 4");
 
         CommandLineParser commandLineParser = new DefaultParser();
@@ -91,6 +94,8 @@ public class IngestBalancer extends Thread implements MessageListener {
         destinationIngest = commandLine.getOptionValue("destination_ingest", "xqa.ingest");
         destinationEvent = commandLine.getOptionValue("destination_event", "xqa.event");
         destinationShardSize = commandLine.getOptionValue("destination_shard_size", "xqa.shard.size");
+
+        insertThreadWait = Integer.parseInt(commandLine.getOptionValue("insert_thread_wait", "60000"));
 
         poolSize = Integer.parseInt(commandLine.getOptionValue("pool_size", "1"));
     }
@@ -116,6 +121,8 @@ public class IngestBalancer extends Thread implements MessageListener {
             while (!stop) {
                 Thread.sleep(500);
             }
+
+            messageBroker.close();
         } catch (Exception exception) {
             logger.error(exception.getMessage());
             exception.printStackTrace();
@@ -153,13 +160,7 @@ public class IngestBalancer extends Thread implements MessageListener {
 
             if (message.getJMSDestination().toString().equals(destinationIngest)) {
                 logger.info(MessageLogger.log(MessageLogger.Direction.RECEIVE, message, true));
-                ingestPoolExecutor.execute(new InserterThread(
-                        serviceId,
-                        messageBroker,
-                        message,
-                        poolSize,
-                        destinationEvent,
-                        destinationShardSize));
+                ingestPoolExecutor.execute(new InserterThread(this, messageBroker, message));
             }
         } catch (Exception exception) {
             logger.error(exception.getMessage());

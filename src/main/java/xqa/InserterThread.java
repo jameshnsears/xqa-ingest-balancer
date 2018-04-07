@@ -16,30 +16,19 @@ import java.util.UUID;
 class InserterThread extends Thread {
     private static final Logger logger = LoggerFactory.getLogger(InserterThread.class);
 
-    private final String serviceId;
+    private final IngestBalancer ingestBalancer;
     private final MessageBroker messageBroker;
     private final Message ingestMessage;
-    private final int poolSize;
 
-    private final String destinationEvent;
-    private String destinationSize;
-
-    public InserterThread(String serviceId,
+    public InserterThread(IngestBalancer ingestBalancer,
                           MessageBroker messageBroker,
-                          Message ingestMessage,
-                          int poolSize,
-                          String destinationEvent,
-                          String destinationSize) {
+                          Message ingestMessage) {
         setName("InserterThread");
 
         synchronized (this) {
-            this.serviceId = serviceId;
+            this.ingestBalancer = ingestBalancer;
             this.messageBroker = messageBroker;
             this.ingestMessage = ingestMessage;
-            this.poolSize = poolSize;
-
-            this.destinationEvent = destinationEvent;
-            this.destinationSize = destinationSize;
         }
     }
 
@@ -60,16 +49,16 @@ class InserterThread extends Thread {
         }
     }
 
-    private void sendEventToMessageBroker(final String state) throws Exception {
+    private synchronized void sendEventToMessageBroker(final String state) throws Exception {
         Message message = MessageMaker.createMessage(
                 messageBroker.getSession(),
-                messageBroker.getSession().createQueue(destinationEvent),
+                messageBroker.getSession().createQueue(ingestBalancer.destinationEvent),
                 UUID.randomUUID().toString(),
                 new Gson().toJson(
                         new IngestBalancerEvent(
-                                serviceId,
+                                ingestBalancer.serviceId,
                                 ingestMessage.getJMSCorrelationID(),
-                                poolSize,
+                                ingestBalancer.poolSize,
                                 DigestUtils.sha256Hex(MessageMaker.getBody(ingestMessage)),
                                 state)));
 
@@ -77,34 +66,42 @@ class InserterThread extends Thread {
     }
 
     private List<Message> askShardsForSize() throws Exception {
-        MessageBroker mb = new MessageBroker("0.0.0.0", 5672, "admin", "admin", 3);
+        MessageBroker shardSizeMessageBroker = null;
+        try {
+            shardSizeMessageBroker = new MessageBroker(
+                    ingestBalancer.messageBrokerHost,
+                    ingestBalancer.messageBrokerPort,
+                    ingestBalancer.messageBrokerUsername,
+                    ingestBalancer.messageBrokerPassword,
+                    ingestBalancer.messageBrokerRetryAttempts);
 
-        TemporaryQueue sizeReplyToDestination;
+            TemporaryQueue sizeReplyToDestination = shardSizeMessageBroker.createTemporaryQueue();
 
-        synchronized (this) {
-            sizeReplyToDestination = mb.createTemporaryQueue();
+            synchronized (this) {
+                Message message = MessageMaker.createMessage(
+                        shardSizeMessageBroker.getSession(),
+                        shardSizeMessageBroker.getSession().createTopic(ingestBalancer.destinationShardSize),
+                        sizeReplyToDestination,
+                        UUID.randomUUID().toString(),
+                        "");
+                shardSizeMessageBroker.sendMessage(message);
+            }
 
-            Message message = MessageMaker.createMessage(
-                    mb.getSession(),
-                    mb.getSession().createTopic(destinationSize),
-                    sizeReplyToDestination,
-                    UUID.randomUUID().toString(),
-                    "");
-            mb.sendMessage(message);
+            return getSizeResponses(shardSizeMessageBroker, sizeReplyToDestination);
+        } finally {
+            shardSizeMessageBroker.close();
         }
-
-        List<Message> shardSizeResponses = getSizeResponses(mb, sizeReplyToDestination);
-        mb.close();
-        return shardSizeResponses;
     }
 
     private synchronized List<Message> getSizeResponses(
-            MessageBroker mb,
+            MessageBroker shardSizeMessageBroker,
             TemporaryQueue sizeReplyToDestination) throws Exception {
 
         logger.debug(MessageFormat.format("{0}: START", ingestMessage.getJMSCorrelationID()));
 
-        List<Message> shardSizeResponses = mb.receiveMessagesTemporaryQueue(sizeReplyToDestination, 6000);
+        List<Message> shardSizeResponses = shardSizeMessageBroker.receiveMessagesTemporaryQueue(
+                sizeReplyToDestination,
+                ingestBalancer.insertThreadWait);
 
         if (shardSizeResponses.size() == 0)
             logger.warn(MessageFormat.format("{0}: END: shardSizeResponses={1}; subject={2}",
@@ -122,15 +119,13 @@ class InserterThread extends Thread {
     public Message findSmallestShard(List<Message> shardSizeResponses) throws Exception {
         Message smallestShard = null;
 
-        synchronized (this) {
-            if (shardSizeResponses.size() > 0) {
-                smallestShard = shardSizeResponses.get(0);
+        if (shardSizeResponses.size() > 0) {
+            smallestShard = shardSizeResponses.get(0);
 
-                for (Message currentShard : shardSizeResponses) {
-                    if (Integer.valueOf(
-                            MessageMaker.getBody(smallestShard)) > Integer.valueOf(MessageMaker.getBody(currentShard))) {
-                        smallestShard = currentShard;
-                    }
+            for (Message currentShard : shardSizeResponses) {
+                if (Integer.valueOf(
+                        MessageMaker.getBody(smallestShard)) > Integer.valueOf(MessageMaker.getBody(currentShard))) {
+                    smallestShard = currentShard;
                 }
             }
         }

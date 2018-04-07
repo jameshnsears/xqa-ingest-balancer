@@ -17,7 +17,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class IngestBalancerTest {
-
     @Test
     void ingestBalancerShowUsage() {
         assertThrows(IngestBalancer.CommandLineException.class,
@@ -28,7 +27,10 @@ class IngestBalancerTest {
     void singleIngest() throws Exception {
         IngestBalancer ingestBalancer = new IngestBalancer();
         String messageBrokerHost = "0.0.0.0";
-        ingestBalancer.processCommandLine(new String[]{"-message_broker_host", messageBrokerHost, "-pool_size", "3"});
+        ingestBalancer.processCommandLine(new String[]{
+                "-message_broker_host", messageBrokerHost,
+                "-pool_size", "3",
+                "-insert_thread_wait", "10000"});
         ingestBalancer.start();
 
         MockShard mockShard = new MockShard();
@@ -52,7 +54,8 @@ class IngestBalancerTest {
         messageBroker.close();
     }
 
-    private void sendStopMessage(IngestBalancer ingestBalancer, MessageBroker messageBroker) throws JMSException, UnsupportedEncodingException {
+    private void sendStopMessage(IngestBalancer ingestBalancer,
+                                 MessageBroker messageBroker) throws JMSException, UnsupportedEncodingException {
         messageBroker.sendMessage(MessageMaker.createMessage(
                 messageBroker.getSession(),
                 messageBroker.getSession().createTopic(ingestBalancer.destinationCmdStop),
@@ -60,7 +63,8 @@ class IngestBalancerTest {
                 ""));
     }
 
-    private void sendIngestMessage(IngestBalancer ingestBalancer, MessageBroker messageBroker) throws JMSException, IOException {
+    private void sendIngestMessage(IngestBalancer ingestBalancer,
+                                   MessageBroker messageBroker) throws JMSException, IOException {
         messageBroker.sendMessage(MessageMaker.createMessage(
                 messageBroker.getSession(),
                 messageBroker.getSession().createQueue(ingestBalancer.destinationIngest),
