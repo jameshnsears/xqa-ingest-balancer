@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import sun.misc.Signal;
 import xqa.commons.IngestBalancerConnectionFactory;
 import xqa.commons.MessageLogging;
+import xqa.commons.qpid.jms.MessageBroker;
 
 import javax.jms.*;
 import java.util.Map;
@@ -19,10 +20,22 @@ import java.util.concurrent.ThreadPoolExecutor;
 public class IngestBalancer extends Thread implements MessageListener {
     private static final Logger logger = LoggerFactory.getLogger(IngestBalancer.class);
     private final String serviceId;
+
+    private MessageBroker messageBroker;
+
     public String messageBrokerHost;
+    private int messageBrokerPort;
+    private String messageBrokerUsername;
+    private String messageBrokerPassword;
+    private int messageBrokerRetryAttempts;
+
+    private String insertDestination;
+    private String auditDestination;
+
+    private int poolSize;
+
     private boolean stop = false;
     private ThreadPoolExecutor ingestPoolExecutor;
-    private String poolSize;
 
     public IngestBalancer() {
         serviceId = this.getClass().getSimpleName().toLowerCase() + "/" + UUID.randomUUID().toString().split("-")[0];
@@ -35,7 +48,7 @@ public class IngestBalancer extends Thread implements MessageListener {
 
         try {
             IngestBalancer ingestBalancer = new IngestBalancer();
-            ingestBalancer.consumeCommandLine(args);
+            ingestBalancer.processCommandLine(args);
             ingestBalancer.start();
             ingestBalancer.join();
         } catch (CommandLineException exception) {
@@ -47,14 +60,25 @@ public class IngestBalancer extends Thread implements MessageListener {
         }
     }
 
-    public void consumeCommandLine(String[] args) throws Exception {
+    public void processCommandLine(String[] args) throws ParseException, CommandLineException {
         Options options = new Options();
+
         options.addOption("message_broker_host", true, "i.e. xqa-message-broker");
+        options.addOption("message_broker_port", true, "i.e. 5672");
+        options.addOption("message_broker_username", true, "i.e. admin");
+        options.addOption("message_broker_password", true, "i.e. admin");
+        options.addOption("message_broker_retry", true, "i.e. 3");
+
+        options.addOption("insert_destination", true, "i.e. xqa.insert");
+        options.addOption("audit_destination", true, "i.e. xqa.db.amqp.insert_event");
+
         options.addOption("pool_size", true, "i.e. 4");
+
         CommandLineParser commandLineParser = new DefaultParser();
+        setConfigurationValues(options, commandLineParser.parse(options, args));
+    }
 
-        CommandLine commandLine = commandLineParser.parse(options, args);
-
+    private void setConfigurationValues(Options options, CommandLine commandLine) throws CommandLineException {
         if (commandLine.hasOption("message_broker_host")) {
             messageBrokerHost = commandLine.getOptionValue("message_broker_host");
             logger.info("message_broker_host=" + messageBrokerHost);
@@ -62,21 +86,19 @@ public class IngestBalancer extends Thread implements MessageListener {
             showUsage(options);
         }
 
-        if (commandLine.hasOption("pool_size")) {
-            poolSize = commandLine.getOptionValue("pool_size");
-            logger.info("pool_size=" + poolSize);
-        } else {
-            Map<String, String> env = System.getenv();
-            if (env.get("POOL_SIZE") != null) {
-                poolSize = env.get("POOL_SIZE");
-            } else {
-                poolSize = "1";
-            }
-            logger.info("POOL_SIZE=" + poolSize);
-        }
+        messageBrokerPort = Integer.parseInt(commandLine.getOptionValue("message_broker_port", "5672"));
+        messageBrokerUsername = commandLine.getOptionValue("message_broker_username", "admin");
+        messageBrokerPassword = commandLine.getOptionValue("message_broker_password", "admin");
+        messageBrokerRetryAttempts = Integer.parseInt(commandLine.getOptionValue("message_broker_retry", "3"));
+
+        insertDestination = commandLine.getOptionValue("xquery_destination", "xqa.shard.xquery");
+        auditDestination = commandLine.getOptionValue("audit_destination", "xqa.db.amqp.insert_event");
+
+        poolSize = Integer.parseInt(commandLine.getOptionValue("pool_size", "1"));
+
     }
 
-    private void showUsage(final Options options) throws Exception {
+    private void showUsage(final Options options) throws CommandLineException {
         HelpFormatter formater = new HelpFormatter();
         formater.printHelp("IngestBalancer", options);
         throw new IngestBalancer.CommandLineException();

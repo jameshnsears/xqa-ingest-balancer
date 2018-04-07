@@ -32,9 +32,9 @@ public class InserterThread extends Thread {
     public final Vector<Message> shardSizeResponses;
     private final Message ingestMessage;
     private MessageSender messageSender;
-    private String poolSize;
+    private int poolSize;
 
-    public InserterThread(String serviceId, String messageBrokerHost, String poolSize, Message ingestMessage) {
+    public InserterThread(String serviceId, String messageBrokerHost, int poolSize, Message ingestMessage) {
         setName("InserterThread");
         synchronized (this) {
             this.serviceId = serviceId;

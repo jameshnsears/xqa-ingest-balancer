@@ -14,7 +14,7 @@ import static org.mockito.Mockito.mock;
 class SmallestShardTest {
     @Test
     void findSmallestShard() throws Exception {
-        InserterThread inserter = new InserterThread(this.getClass().getSimpleName(), "127.0.0.1", "1", mock(BytesMessage.class));
+        InserterThread inserter = new InserterThread(this.getClass().getSimpleName(), "127.0.0.1", 1, mock(BytesMessage.class));
 
         JmsMessageFactory factory = new JmsTestMessageFactory();
 

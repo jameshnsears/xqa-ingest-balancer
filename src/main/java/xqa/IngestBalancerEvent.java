@@ -6,13 +6,13 @@ class IngestBalancerEvent {
     private final String serviceId;
     private final long creationTime;
     private final String correlationId;
-    private final String poolSize;
+    private final int poolSize;
     private final String digest;
     private final String state;
 
     public IngestBalancerEvent(final String serviceId,
                                final String correlationId,
-                               final String poolSize,
+                               final int poolSize,
                                final String digest,
                                final String state) {
         this.serviceId = serviceId;

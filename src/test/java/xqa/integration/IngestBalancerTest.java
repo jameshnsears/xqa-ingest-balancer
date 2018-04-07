@@ -21,14 +21,14 @@ class IngestBalancerTest {
         assertThrows(IngestBalancer.CommandLineException.class,
                 () -> {
                     IngestBalancer ingest = new IngestBalancer();
-                    ingest.consumeCommandLine(new String[]{});
+                    ingest.processCommandLine(new String[]{});
                 });
     }
 
     @Test
     void singleIngest() throws Exception {
         IngestBalancer ingestBalancer = new IngestBalancer();
-        ingestBalancer.consumeCommandLine(new String[] {"-message_broker_host", "127.0.0.1", "-pool_size", "3"});
+        ingestBalancer.processCommandLine(new String[] {"-message_broker_host", "127.0.0.1", "-pool_size", "3"});
         ingestBalancer.start();
 
         MockShard mockShard = new MockShard();
