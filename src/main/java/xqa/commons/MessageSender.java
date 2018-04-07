@@ -25,7 +25,7 @@ public class MessageSender {
                 if (retryAttempts == 0) {
                     throw exception;
                 }
-                retryAttempts --;
+                retryAttempts--;
                 Thread.sleep(5000);
             }
         }
@@ -58,12 +58,12 @@ public class MessageSender {
     }
 
     public BytesMessage sendMessage(DestinationType destinationType,
-                            String destinationName,
-                            String correlationID,
-                            Destination replyTo,
-                            String subject,
-                            String body,
-                            int deliveryMode) throws Exception {
+                                    String destinationName,
+                                    String correlationID,
+                                    Destination replyTo,
+                                    String subject,
+                                    String body,
+                                    int deliveryMode) throws Exception {
         Destination destination;
         if (destinationType == DestinationType.Queue) {
             destination = session.createQueue(destinationName);

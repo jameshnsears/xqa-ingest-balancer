@@ -10,27 +10,26 @@ import xqa.commons.MessageLogging;
 import xqa.commons.qpid.jms.MessageBroker;
 
 import javax.jms.*;
-import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 
-@SuppressWarnings("restriction")
+
 public class IngestBalancer extends Thread implements MessageListener {
     private static final Logger logger = LoggerFactory.getLogger(IngestBalancer.class);
     private final String serviceId;
-
-    private MessageBroker messageBroker;
-
     public String messageBrokerHost;
+    private MessageBroker messageBroker;
     private int messageBrokerPort;
     private String messageBrokerUsername;
     private String messageBrokerPassword;
     private int messageBrokerRetryAttempts;
 
-    private String insertDestination;
-    private String auditDestination;
+    private String destinationIngest;
+    private String destinationEvent;
+    private String destinationShardSize;
+    private String destinationShardInsert;
 
     private int poolSize;
 
@@ -69,8 +68,10 @@ public class IngestBalancer extends Thread implements MessageListener {
         options.addOption("message_broker_password", true, "i.e. admin");
         options.addOption("message_broker_retry", true, "i.e. 3");
 
-        options.addOption("insert_destination", true, "i.e. xqa.insert");
-        options.addOption("audit_destination", true, "i.e. xqa.db.amqp.insert_event");
+        options.addOption("destination_ingest", true, "i.e. xqa.ingest");
+        options.addOption("destination_event", true, "i.e. xqa.event");
+        options.addOption("destination_shard_size", true, "i.e. xqa.shard.size");
+        options.addOption("destination_shard_insert", true, "i.e. xqa.shard.insert");
 
         options.addOption("pool_size", true, "i.e. 4");
 
@@ -91,11 +92,12 @@ public class IngestBalancer extends Thread implements MessageListener {
         messageBrokerPassword = commandLine.getOptionValue("message_broker_password", "admin");
         messageBrokerRetryAttempts = Integer.parseInt(commandLine.getOptionValue("message_broker_retry", "3"));
 
-        insertDestination = commandLine.getOptionValue("xquery_destination", "xqa.shard.xquery");
-        auditDestination = commandLine.getOptionValue("audit_destination", "xqa.db.amqp.insert_event");
+        destinationIngest = commandLine.getOptionValue("destination_ingest", "xqa.ingest");
+        destinationEvent = commandLine.getOptionValue("destination_event", "xqa.db.event");
+        destinationShardSize = commandLine.getOptionValue("destination_shard_size", "xqa.shard.size");
+        destinationShardInsert = commandLine.getOptionValue("destination_shard_insert", "xqa.shard.insert");
 
         poolSize = Integer.parseInt(commandLine.getOptionValue("pool_size", "1"));
-
     }
 
     private void showUsage(final Options options) throws CommandLineException {
@@ -145,7 +147,7 @@ public class IngestBalancer extends Thread implements MessageListener {
                 if (retryAttempts == 0) {
                     throw exception;
                 }
-                retryAttempts --;
+                retryAttempts--;
                 Thread.sleep(5000);
             }
         }

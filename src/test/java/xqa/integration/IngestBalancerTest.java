@@ -28,7 +28,7 @@ class IngestBalancerTest {
     @Test
     void singleIngest() throws Exception {
         IngestBalancer ingestBalancer = new IngestBalancer();
-        ingestBalancer.processCommandLine(new String[] {"-message_broker_host", "127.0.0.1", "-pool_size", "3"});
+        ingestBalancer.processCommandLine(new String[]{"-message_broker_host", "127.0.0.1", "-pool_size", "3"});
         ingestBalancer.start();
 
         MockShard mockShard = new MockShard();

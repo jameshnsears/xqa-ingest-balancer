@@ -1,35 +1,24 @@
 package xqa;
 
-import java.text.MessageFormat;
-import java.util.UUID;
-import java.util.Vector;
-
-import javax.jms.BytesMessage;
-import javax.jms.Connection;
-import javax.jms.ConnectionFactory;
-import javax.jms.DeliveryMode;
-import javax.jms.Destination;
-import javax.jms.Message;
-import javax.jms.MessageConsumer;
-import javax.jms.MessageProducer;
-import javax.jms.Session;
-
+import com.google.gson.Gson;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.qpid.jms.message.JmsBytesMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.google.gson.Gson;
-
 import xqa.commons.IngestBalancerConnectionFactory;
 import xqa.commons.MessageLogging;
 import xqa.commons.MessageSender;
 
+import javax.jms.*;
+import java.text.MessageFormat;
+import java.util.UUID;
+import java.util.Vector;
+
 public class InserterThread extends Thread {
     private static final Logger logger = LoggerFactory.getLogger(IngestBalancer.class);
+    public final Vector<Message> shardSizeResponses;
     private final String serviceId;
     private final String messageBrokerHost;
-    public final Vector<Message> shardSizeResponses;
     private final Message ingestMessage;
     private MessageSender messageSender;
     private int poolSize;
