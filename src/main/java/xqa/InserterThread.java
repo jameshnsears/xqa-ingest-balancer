@@ -44,7 +44,6 @@ class InserterThread extends Thread {
             sendEventToMessageBroker("END");
         } catch (Exception exception) {
             logger.error(exception.getMessage());
-            exception.printStackTrace();
             System.exit(1);
         }
     }

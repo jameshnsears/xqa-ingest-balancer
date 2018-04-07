@@ -125,7 +125,6 @@ public class IngestBalancer extends Thread implements MessageListener {
             messageBroker.close();
         } catch (Exception exception) {
             logger.error(exception.getMessage());
-            exception.printStackTrace();
             System.exit(1);
         } finally {
             ingestPoolExecutor.shutdown();

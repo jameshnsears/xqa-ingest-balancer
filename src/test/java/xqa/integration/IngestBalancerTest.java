@@ -38,7 +38,7 @@ class IngestBalancerTest {
 
         MessageBroker messageBroker = new MessageBroker(messageBrokerHost, 5672, "admin", "admin", 3);
 
-        sendIngestMessage(ingestBalancer, messageBroker);
+        sendIngestMessage(ingestBalancer.destinationIngest, messageBroker);
 
         while (mockShard.digestOfMostRecentMessage == null) {
             Thread.sleep(1000);
@@ -46,7 +46,7 @@ class IngestBalancerTest {
 
         assertEquals("192a0c3918e308c1374d57256b183045393c1cf9053a8614e9d7bb24b8261358", mockShard.digestOfMostRecentMessage);
 
-        sendStopMessage(ingestBalancer, messageBroker);
+        sendStopMessage(ingestBalancer.destinationCmdStop, messageBroker);
 
         mockShard.join();
         ingestBalancer.join();
@@ -54,23 +54,23 @@ class IngestBalancerTest {
         messageBroker.close();
     }
 
-    private void sendStopMessage(IngestBalancer ingestBalancer,
-                                 MessageBroker messageBroker) throws JMSException, UnsupportedEncodingException {
-        messageBroker.sendMessage(MessageMaker.createMessage(
-                messageBroker.getSession(),
-                messageBroker.getSession().createTopic(ingestBalancer.destinationCmdStop),
-                UUID.randomUUID().toString(),
-                ""));
-    }
-
-    private void sendIngestMessage(IngestBalancer ingestBalancer,
+    private void sendIngestMessage(String destination,
                                    MessageBroker messageBroker) throws JMSException, IOException {
         messageBroker.sendMessage(MessageMaker.createMessage(
                 messageBroker.getSession(),
-                messageBroker.getSession().createQueue(ingestBalancer.destinationIngest),
+                messageBroker.getSession().createQueue(destination),
                 UUID.randomUUID().toString(),
                 xmlFilePath(),
                 xmlFileContents()));
+    }
+
+    private void sendStopMessage(String destination,
+                                 MessageBroker messageBroker) throws JMSException, UnsupportedEncodingException {
+        messageBroker.sendMessage(MessageMaker.createMessage(
+                messageBroker.getSession(),
+                messageBroker.getSession().createTopic(destination),
+                UUID.randomUUID().toString(),
+                ""));
     }
 
     private String xmlFileContents() throws IOException {
