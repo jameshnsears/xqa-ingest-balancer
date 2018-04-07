@@ -13,15 +13,15 @@ import java.text.MessageFormat;
 import java.util.List;
 import java.util.UUID;
 
-public class InserterThread extends Thread {
+class InserterThread extends Thread {
     private static final Logger logger = LoggerFactory.getLogger(InserterThread.class);
 
     private final String serviceId;
     private final MessageBroker messageBroker;
     private final Message ingestMessage;
-    private int poolSize;
+    private final int poolSize;
 
-    private String destinationEvent;
+    private final String destinationEvent;
     private String destinationSize;
 
     public InserterThread(String serviceId,

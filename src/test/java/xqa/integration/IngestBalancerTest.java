@@ -17,19 +17,17 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class IngestBalancerTest {
-    private String messageBrokerHost = "0.0.0.0";
 
     @Test
     void ingestBalancerShowUsage() {
         assertThrows(IngestBalancer.CommandLineException.class,
-                () -> {
-                    IngestBalancer.main(new String[]{});
-                });
+                () -> IngestBalancer.main(new String[]{}));
     }
 
     @Test
     void singleIngest() throws Exception {
         IngestBalancer ingestBalancer = new IngestBalancer();
+        String messageBrokerHost = "0.0.0.0";
         ingestBalancer.processCommandLine(new String[]{"-message_broker_host", messageBrokerHost, "-pool_size", "3"});
         ingestBalancer.start();
 

@@ -18,9 +18,9 @@ class MockShard extends Thread implements Runnable, MessageListener {
     public String digestOfMostRecentMessage;
     private MessageBroker messageBroker;
     private boolean stop = false;
-    private String destinationInsertRoot = "xqa.shard.insert.";
-    private String destinationShardSize = "xqa.shard.size";
-    private String destinationCmdStop = "xqa.cmd.stop";
+    private final String destinationInsertRoot = "xqa.shard.insert.";
+    private final String destinationShardSize = "xqa.shard.size";
+    private final String destinationCmdStop = "xqa.cmd.stop";
     private Destination insertUuidDestination;
 
     public MockShard() throws MessageBroker.MessageBrokerException {
@@ -75,17 +75,21 @@ class MockShard extends Thread implements Runnable, MessageListener {
 
     public void onMessage(Message message) {
         try {
-            if (message.getJMSDestination().toString().equals(destinationCmdStop)) {
-                logger.debug(MessageLogger.log(MessageLogger.Direction.RECEIVE, message, false));
-                stop = true;
-            } else if (message.getJMSDestination().toString().equals(destinationShardSize)) {
-                logger.debug(MessageLogger.log(MessageLogger.Direction.RECEIVE, message, false));
-                sendSizeReply(message);
-            } else {
-                logger.debug(MessageLogger.log(MessageLogger.Direction.RECEIVE, message, true));
-                synchronized (this) {
-                    digestOfMostRecentMessage = DigestUtils.sha256Hex(MessageMaker.getBody(message));
-                }
+            switch (message.getJMSDestination().toString()) {
+                case destinationCmdStop:
+                    logger.debug(MessageLogger.log(MessageLogger.Direction.RECEIVE, message, false));
+                    stop = true;
+                    break;
+                case destinationShardSize:
+                    logger.debug(MessageLogger.log(MessageLogger.Direction.RECEIVE, message, false));
+                    sendSizeReply(message);
+                    break;
+                default:
+                    logger.debug(MessageLogger.log(MessageLogger.Direction.RECEIVE, message, true));
+                    synchronized (this) {
+                        digestOfMostRecentMessage = DigestUtils.sha256Hex(MessageMaker.getBody(message));
+                    }
+                    break;
             }
         } catch (Exception exception) {
             logger.error(exception.getMessage());

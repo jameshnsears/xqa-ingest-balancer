@@ -23,11 +23,11 @@ public class IngestBalancer extends Thread implements MessageListener {
     public final String serviceId;
 
     public MessageBroker messageBroker;
-    public String messageBrokerHost;
+    private String messageBrokerHost;
     public String destinationIngest;
     public String destinationEvent;
     public String destinationShardSize;
-    public String destinationCmdStop = "xqa.cmd.stop";
+    public final String destinationCmdStop = "xqa.cmd.stop";
     public int poolSize;
     private int messageBrokerPort;
     private String messageBrokerUsername;
