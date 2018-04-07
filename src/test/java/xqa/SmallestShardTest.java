@@ -8,7 +8,6 @@ import xqa.commons.qpid.jms.MessageMaker;
 
 import javax.jms.BytesMessage;
 import javax.jms.Message;
-
 import java.util.List;
 import java.util.Vector;
 
@@ -20,7 +19,7 @@ class SmallestShardTest {
     void findSmallestShard() throws Exception {
 
         IngestBalancer ingestBalancer = new IngestBalancer();
-        ingestBalancer.processCommandLine(new String[] {"-message_broker_host", "127.0.0.1"});
+        ingestBalancer.processCommandLine(new String[]{"-message_broker_host", "127.0.0.1"});
 
         InserterThread inserterThread = new InserterThread(
                 ingestBalancer.serviceId,
