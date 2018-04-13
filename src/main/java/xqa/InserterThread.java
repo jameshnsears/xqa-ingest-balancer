@@ -17,23 +17,29 @@ class InserterThread extends Thread {
     private static final Logger logger = LoggerFactory.getLogger(InserterThread.class);
 
     private final IngestBalancer ingestBalancer;
-    private final MessageBroker messageBroker;
     private final Message ingestMessage;
+    private MessageBroker inserterThreadMessageBroker;
 
-    public InserterThread(IngestBalancer ingestBalancer,
-                          MessageBroker messageBroker,
-                          Message ingestMessage) {
+    public InserterThread(IngestBalancer ingestBalancer, Message ingestMessage) {
         setName("InserterThread");
 
         synchronized (this) {
             this.ingestBalancer = ingestBalancer;
-            this.messageBroker = messageBroker;
             this.ingestMessage = ingestMessage;
         }
     }
 
     public void run() {
         try {
+            synchronized (this) {
+                inserterThreadMessageBroker = new MessageBroker(
+                        ingestBalancer.messageBrokerHost,
+                        ingestBalancer.messageBrokerPort,
+                        ingestBalancer.messageBrokerUsername,
+                        ingestBalancer.messageBrokerPassword,
+                        ingestBalancer.messageBrokerRetryAttempts);
+            }
+
             sendEventToMessageBroker("START");
 
             Message smallestShard = findSmallestShard(askShardsForSize());
@@ -42,6 +48,10 @@ class InserterThread extends Thread {
             }
 
             sendEventToMessageBroker("END");
+
+            synchronized (this) {
+                inserterThreadMessageBroker.close();
+            }
         } catch (Exception exception) {
             logger.error(exception.getMessage());
             System.exit(1);
@@ -50,8 +60,8 @@ class InserterThread extends Thread {
 
     private synchronized void sendEventToMessageBroker(final String state) throws Exception {
         Message message = MessageMaker.createMessage(
-                messageBroker.getSession(),
-                messageBroker.getSession().createQueue(ingestBalancer.destinationEvent),
+                inserterThreadMessageBroker.getSession(),
+                inserterThreadMessageBroker.getSession().createQueue(ingestBalancer.destinationEvent),
                 UUID.randomUUID().toString(),
                 new Gson().toJson(
                         new IngestBalancerEvent(
@@ -61,35 +71,21 @@ class InserterThread extends Thread {
                                 DigestUtils.sha256Hex(MessageMaker.getBody(ingestMessage)),
                                 state)));
 
-        messageBroker.sendMessage(message);
+        inserterThreadMessageBroker.sendMessage(message);
     }
 
-    private List<Message> askShardsForSize() throws Exception {
-        MessageBroker shardSizeMessageBroker = null;
-        try {
-            shardSizeMessageBroker = new MessageBroker(
-                    ingestBalancer.messageBrokerHost,
-                    ingestBalancer.messageBrokerPort,
-                    ingestBalancer.messageBrokerUsername,
-                    ingestBalancer.messageBrokerPassword,
-                    ingestBalancer.messageBrokerRetryAttempts);
+    private synchronized List<Message> askShardsForSize() throws Exception {
+        TemporaryQueue sizeReplyToDestination = inserterThreadMessageBroker.createTemporaryQueue();
 
-            TemporaryQueue sizeReplyToDestination = shardSizeMessageBroker.createTemporaryQueue();
+        Message message = MessageMaker.createMessage(
+                inserterThreadMessageBroker.getSession(),
+                inserterThreadMessageBroker.getSession().createTopic(ingestBalancer.destinationShardSize),
+                sizeReplyToDestination,
+                UUID.randomUUID().toString(),
+                "");
+        inserterThreadMessageBroker.sendMessage(message);
 
-            synchronized (this) {
-                Message message = MessageMaker.createMessage(
-                        shardSizeMessageBroker.getSession(),
-                        shardSizeMessageBroker.getSession().createTopic(ingestBalancer.destinationShardSize),
-                        sizeReplyToDestination,
-                        UUID.randomUUID().toString(),
-                        "");
-                shardSizeMessageBroker.sendMessage(message);
-            }
-
-            return getSizeResponses(shardSizeMessageBroker, sizeReplyToDestination);
-        } finally {
-            shardSizeMessageBroker.close();
-        }
+        return getSizeResponses(inserterThreadMessageBroker, sizeReplyToDestination);
     }
 
     private synchronized List<Message> getSizeResponses(
@@ -132,13 +128,14 @@ class InserterThread extends Thread {
         return smallestShard;
     }
 
-    private void insert(final Message smallestShard) throws Exception {
+    private synchronized void insert(final Message smallestShard) throws Exception {
         Message message = MessageMaker.createMessage(
-                messageBroker.getSession(),
-                smallestShard.getJMSReplyTo(),
+                inserterThreadMessageBroker.getSession(),
+                inserterThreadMessageBroker.getSession().createQueue(smallestShard.getJMSReplyTo().toString()),
                 ingestMessage.getJMSCorrelationID(),
+                MessageMaker.getSubject(ingestMessage),
                 MessageMaker.getBody(ingestMessage));
 
-        messageBroker.sendMessage(message);
+        inserterThreadMessageBroker.sendMessage(message);
     }
 }

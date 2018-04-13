@@ -22,7 +22,7 @@ public class IngestBalancer extends Thread implements MessageListener {
     private static final Logger logger = LoggerFactory.getLogger(IngestBalancer.class);
     public final String serviceId;
 
-    public MessageBroker messageBroker;
+    private MessageBroker messageBroker;
     public String messageBrokerHost;
     public String destinationIngest;
     public String destinationEvent;
@@ -159,7 +159,7 @@ public class IngestBalancer extends Thread implements MessageListener {
 
             if (message.getJMSDestination().toString().equals(destinationIngest)) {
                 logger.info(MessageLogger.log(MessageLogger.Direction.RECEIVE, message, true));
-                ingestPoolExecutor.execute(new InserterThread(this, messageBroker, message));
+                ingestPoolExecutor.execute(new InserterThread(this, message));
             }
         } catch (Exception exception) {
             logger.error(exception.getMessage());

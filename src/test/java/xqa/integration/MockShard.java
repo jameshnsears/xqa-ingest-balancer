@@ -98,7 +98,7 @@ class MockShard extends Thread implements Runnable, MessageListener {
         }
     }
 
-    public void sendSizeReply(Message message) throws Exception {
+    private void sendSizeReply(Message message) throws Exception {
         messageBroker.sendMessage(MessageMaker.createMessage(
                 messageBroker.getSession(),
                 message.getJMSReplyTo(),
