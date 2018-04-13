@@ -12,6 +12,7 @@ import javax.jms.Destination;
 import javax.jms.Message;
 import javax.jms.MessageConsumer;
 import javax.jms.MessageListener;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
@@ -96,8 +97,15 @@ public class IngestBalancer extends Thread implements MessageListener {
         destinationShardSize = commandLine.getOptionValue("destination_shard_size", "xqa.shard.size");
 
         insertThreadWait = Integer.parseInt(commandLine.getOptionValue("insert_thread_wait", "60000"));
+        logger.info("insert_thread_wait=" + insertThreadWait);
 
-        poolSize = Integer.parseInt(commandLine.getOptionValue("pool_size", "1"));
+        Map<String, String> env = System.getenv();
+        if (env.get("POOL_SIZE") != null) {
+            poolSize = Integer.parseInt(env.get("POOL_SIZE"));
+        } else {
+            poolSize = Integer.parseInt(commandLine.getOptionValue("pool_size", "1"));
+        }
+        logger.info("pool_size=" + poolSize);
     }
 
     private void showUsage(final Options options) throws CommandLineException {
