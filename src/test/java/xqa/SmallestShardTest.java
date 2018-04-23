@@ -17,7 +17,6 @@ import static org.mockito.Mockito.mock;
 class SmallestShardTest {
     @Test
     void findSmallestShard() throws Exception {
-
         IngestBalancer ingestBalancer = new IngestBalancer();
         ingestBalancer.processCommandLine(new String[]{"-message_broker_host", "127.0.0.1"});
 
@@ -31,13 +30,13 @@ class SmallestShardTest {
         big.writeBytes("10".getBytes());
         shardSizeResponses.add(big);
 
-        JmsBytesMessage bigger = factory.createBytesMessage();
-        bigger.writeBytes("30".getBytes());
-        shardSizeResponses.add(bigger);
-
         JmsBytesMessage smallest = factory.createBytesMessage();
         smallest.writeBytes("5".getBytes());
         shardSizeResponses.add(smallest);
+
+        JmsBytesMessage bigger = factory.createBytesMessage();
+        bigger.writeBytes("30".getBytes());
+        shardSizeResponses.add(bigger);
 
         assertEquals(
                 MessageMaker.getBody(smallest),
