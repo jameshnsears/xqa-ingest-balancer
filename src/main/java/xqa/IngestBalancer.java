@@ -35,6 +35,7 @@ public class IngestBalancer extends Thread implements MessageListener {
     public String messageBrokerPassword;
     public int messageBrokerRetryAttempts;
     public int insertThreadWait;
+    public int insertThreadSecondaryWait;
     private boolean stop = false;
     private ThreadPoolExecutor ingestPoolExecutor;
 
@@ -72,6 +73,8 @@ public class IngestBalancer extends Thread implements MessageListener {
         options.addOption("destination_shard_size", true, "i.e. xqa.shard.size");
 
         options.addOption("insert_thread_wait", true, "i.e. 60000");
+        options.addOption("insert_thread_secondary_wait", true, "i.e. 5000");
+
 
         options.addOption("pool_size", true, "i.e. 4");
 
@@ -96,6 +99,9 @@ public class IngestBalancer extends Thread implements MessageListener {
         destinationEvent = commandLine.getOptionValue("destination_event", "xqa.event");
         destinationShardSize = commandLine.getOptionValue("destination_shard_size", "xqa.shard.size");
 
+        insertThreadSecondaryWait = Integer.parseInt(commandLine.getOptionValue("insert_thread_secondary_wait", "5000"));
+        logger.info("insert_thread_secondary_wait=" + insertThreadSecondaryWait);
+
         insertThreadWait = Integer.parseInt(commandLine.getOptionValue("insert_thread_wait", "60000"));
         logger.info("insert_thread_wait=" + insertThreadWait);
 
@@ -103,7 +109,7 @@ public class IngestBalancer extends Thread implements MessageListener {
         if (env.get("POOL_SIZE") != null) {
             poolSize = Integer.parseInt(env.get("POOL_SIZE"));
         } else {
-            poolSize = Integer.parseInt(commandLine.getOptionValue("pool_size", "1"));
+            poolSize = Integer.parseInt(commandLine.getOptionValue("pool_size", "4"));
         }
         logger.info("pool_size=" + poolSize);
     }

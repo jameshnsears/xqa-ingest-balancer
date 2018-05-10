@@ -96,7 +96,8 @@ class InserterThread extends Thread {
 
         List<Message> shardSizeResponses = shardSizeMessageBroker.receiveMessagesTemporaryQueue(
                 sizeReplyToDestination,
-                ingestBalancer.insertThreadWait);
+                ingestBalancer.insertThreadWait,
+                ingestBalancer.insertThreadSecondaryWait);
 
         if (shardSizeResponses.size() == 0)
             logger.warn(MessageFormat.format("{0}: END: shardSizeResponses={1}; subject={2}",

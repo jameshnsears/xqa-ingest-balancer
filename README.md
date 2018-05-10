@@ -27,8 +27,7 @@
 
 or
 
-* POOL_SIZE=2
-* docker-compose -p "dev" up -d
+* POOL_SIZE=4 docker-compose -p "dev" up -d
 
 ## 4. Teardown
 * docker-compose -p "dev" down -v

@@ -46,7 +46,7 @@
 		<dependency>
 			<groupId>com.github.jameshnsears</groupId>
 			<artifactId>xqa-commons-qpid-jms</artifactId>
-			<version>1.3</version>
+			<version>1.4</version>
 		</dependency>
 
 		<dependency>
