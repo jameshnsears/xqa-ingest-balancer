@@ -4,7 +4,6 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.apache.commons.cli.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import sun.misc.Signal;
 import xqa.commons.qpid.jms.MessageBroker;
 import xqa.commons.qpid.jms.MessageLogger;
 
@@ -46,13 +45,13 @@ public class IngestBalancer extends Thread implements MessageListener {
     }
 
     public static void main(String[] args) throws ParseException, InterruptedException, CommandLineException {
-        Signal.handle(new Signal("INT"), signal -> System.exit(1));
-
         try {
             IngestBalancer ingestBalancer = new IngestBalancer();
             ingestBalancer.processCommandLine(args);
             ingestBalancer.start();
             ingestBalancer.join();
+        } catch (CommandLineException exception) {
+            System.exit(0);
         } catch (Exception exception) {
             logger.error(exception.getMessage());
             throw exception;
