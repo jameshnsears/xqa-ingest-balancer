@@ -72,11 +72,10 @@ public class IngestBalancer extends Thread implements MessageListener {
         options.addOption("destination_event", true, "i.e. xqa.event");
         options.addOption("destination_shard_size", true, "i.e. xqa.shard.size");
 
+        options.addOption("pool_size", true, "i.e. 4");
+
         options.addOption("insert_thread_wait", true, "i.e. 60000");
         options.addOption("insert_thread_secondary_wait", true, "i.e. 5000");
-
-
-        options.addOption("pool_size", true, "i.e. 4");
 
         CommandLineParser commandLineParser = new DefaultParser();
         setConfigurationValues(options, commandLineParser.parse(options, args));

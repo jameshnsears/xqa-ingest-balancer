@@ -3,6 +3,8 @@
 
 ![High Level Design](https://github.com/jameshnsears/xqa-documentation/blob/master/uml/ingest-balancer-sequence-diagram.jpg)
 
+TODO https://medium.com/criciumadev/its-time-migrating-to-java-11-5eb3868354f9
+
 ## 1. Build
 
 ### 1.1. Maven
