@@ -9,6 +9,7 @@ services:
   - docker
 
 jdk:
+  - oraclejdk10
   - oraclejdk11
 
 cache:
