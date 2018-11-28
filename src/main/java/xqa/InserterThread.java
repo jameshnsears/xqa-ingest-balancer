@@ -59,6 +59,7 @@ class InserterThread extends Thread {
     }
 
     private synchronized void sendEventToMessageBroker(final String state) throws Exception {
+        logger.debug("+", state);
         Message message = MessageMaker.createMessage(
                 inserterThreadMessageBroker.getSession(),
                 inserterThreadMessageBroker.getSession().createQueue(ingestBalancer.destinationEvent),
