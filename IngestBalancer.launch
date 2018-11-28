@@ -7,8 +7,8 @@
         <listEntry value="1"/>
     </listAttribute>
     <mapAttribute key="org.eclipse.debug.core.environmentVariables">
-        <mapEntry key="PN_TRACE_EVT-xx" value="1"/>
-        <mapEntry key="PN_TRACE_FRM-xx" value="1"/>
+        <mapEntry key="PN_TRACE_EVT" value="1"/>
+        <mapEntry key="PN_TRACE_FRM" value="1"/>
         <mapEntry key="POOL_SIZE" value="1"/>
     </mapAttribute>
     <listAttribute key="org.eclipse.debug.ui.favoriteGroups">
