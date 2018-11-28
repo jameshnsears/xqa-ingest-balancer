@@ -3,6 +3,7 @@
 	<name>xqa-ingest-balancer</name>
 	<comment></comment>
 	<projects>
+		<project>xqa-commons-qpid-jms</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

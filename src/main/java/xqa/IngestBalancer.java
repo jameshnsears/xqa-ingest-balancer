@@ -44,7 +44,7 @@ public class IngestBalancer extends Thread implements MessageListener {
         setName("IngestBalancer");
     }
 
-    public static void main(String[] args) throws ParseException, InterruptedException, CommandLineException {
+    public static void main(String[] args) {
         try {
             IngestBalancer ingestBalancer = new IngestBalancer();
             ingestBalancer.processCommandLine(args);
@@ -54,7 +54,7 @@ public class IngestBalancer extends Thread implements MessageListener {
             System.exit(0);
         } catch (Exception exception) {
             logger.error(exception.getMessage());
-            throw exception;
+            System.exit(0);
         }
     }
 
