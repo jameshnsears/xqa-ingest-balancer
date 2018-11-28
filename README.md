@@ -12,10 +12,10 @@ TODO https://medium.com/criciumadev/its-time-migrating-to-java-11-5eb3868354f9
 * mvn package -DskipTests
 
 ### 1.2. Docker
-* docker-compose -p "dev" build --force-rm
+* docker-compose build --force-rm
 
 ## 2. Bring up
-* docker-compose -p "dev" up -d xqa-message-broker
+* docker-compose up -d xqa-message-broker
 
 ### 3. Test
 
@@ -29,7 +29,7 @@ TODO https://medium.com/criciumadev/its-time-migrating-to-java-11-5eb3868354f9
 
 or
 
-* POOL_SIZE=4 docker-compose -p "dev" up -d
+* POOL_SIZE=4 docker-compose up -d
 
 ## 4. Teardown
-* docker-compose -p "dev" down -v
+* docker-compose down -v

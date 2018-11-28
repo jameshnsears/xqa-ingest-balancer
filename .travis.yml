@@ -16,7 +16,7 @@ cache:
   - $HOME/.m2
 
 before_script:
-  - docker-compose -p "dev" up -d xqa-message-broker
+  - docker-compose up -d xqa-message-broker
 
   - mvn install -DskipTests=true -Dmaven.javadoc.skip=true -B -V
 
