@@ -6,13 +6,7 @@
 TODO https://medium.com/criciumadev/its-time-migrating-to-java-11-5eb3868354f9
 
 ## 1. Build
-
-### 1.1. Maven
-* rm -rf $HOME/.m2/*
-* mvn package -DskipTests
-
-### 1.2. Docker
-* docker-compose build --force-rm
+* ./build.sh
 
 ## 2. Bring up
 * docker-compose up -d xqa-message-broker
