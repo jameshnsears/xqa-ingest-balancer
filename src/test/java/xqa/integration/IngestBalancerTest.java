@@ -18,12 +18,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class IngestBalancerTest {
     @Test
-    void ingestBalancerShowUsage() {
-        assertThrows(IngestBalancer.CommandLineException.class,
-                () -> IngestBalancer.main(new String[]{}));
-    }
-
-    @Test
     void singleIngest() throws Exception {
         IngestBalancer ingestBalancer = new IngestBalancer();
         String messageBrokerHost = "0.0.0.0";

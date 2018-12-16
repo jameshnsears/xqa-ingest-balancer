@@ -85,7 +85,8 @@ public class IngestBalancer extends Thread implements MessageListener {
             messageBrokerHost = commandLine.getOptionValue("message_broker_host");
             logger.info("message_broker_host=" + messageBrokerHost);
         } else {
-            showUsage(options);
+            //showUsage(options);
+            messageBrokerHost = commandLine.getOptionValue("message_broker_host", "127.0.0.1");
         }
 
         messageBrokerPort = Integer.parseInt(commandLine.getOptionValue("message_broker_port", "5672"));
