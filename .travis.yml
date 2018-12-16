@@ -5,24 +5,30 @@ sudo: required
 notifications:
 email: james.hn.sears@gmail.com
 
+addons:
+  sonarcloud:
+    organization: "jameshnsears-github"
+    token:
+      secure: "J0GyiSZzE4wgWI6JJxzIVIhqOqYz7dn8xWfQhO7cC1Etgr6TTU+JTF3BaV0d59VhKO2o/9ap3zY7oj00bfdaVj0AM70BOj5xE4SlIXNzQdnJmJnvuZQ/Q/o7F1AOTGNX8ItGMCEjEeAdMPBaUVZ9Fo0betIxc2AlJakhxY6nwxTFbbmmOsDiihfDfUHAH5JAOaU5s+/jANosX0OwQJOO/whfOZi2p5eBplr5M6XiXO2Dr/CWPo4H8cWv9qnFyQyH0qYBu6YZT6CY7A5QFnCMhe2RgViNGPHUoBefRzhJldcjR4gCIBDkRGloFshjjKfeYi986Dj63Y1/rc8Mti+1bPnuXOaCoCqCsr8ESPGeNGB2RBgVbz3H/A0Urcwh10d1o4kwdnKlfLJZQLYL+wGXW8aWlPue59Cl44QpNLd7TbcskIPd73I0WHcPwLo+1Y25GfrhUq11uG4FzjWAaLL/CDbtCwZIiryRw9gQB+4xLzVWAyc1MhqDTJS4FgV45vywqWoS6QDyiXT3iRoRgTciv5pOzy1lz6Sy3YgiswzxY+Eqb4m28GqKkDfs02UjACSIxnoRLIv7tX0DcuEF6qt6v9LQwocZu6uF6Fl+Z2vyhF/S/fx6VjMs2SZCQ0fMFifzWI0tKoK0L+2zOXCljK7IC6D0an0RGrRnDmMh7oeL0/o="
+
 services:
   - docker
 
 jdk:
-  - oraclejdk10
-  - oraclejdk11
+  - openjdk11
 
 cache:
   directories:
-  - $HOME/.m2
+    - $HOME/.m2
+    - $HOME/.sonar/cache
 
 before_script:
   - docker-compose up -d xqa-message-broker
 
-  - mvn install -DskipTests=true -Dmaven.javadoc.skip=true -B -V
-
 script:
   - mvn clean test
- 
+  - mvn checkstyle:check spotbugs:check pmd:pmd
+
 after_success:
   - mvn jacoco:report coveralls:report
+  - sonar-scanner
