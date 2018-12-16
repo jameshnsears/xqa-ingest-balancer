@@ -1,20 +1,22 @@
 package xqa;
 
-import com.google.gson.Gson;
-import org.apache.commons.codec.digest.DigestUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import xqa.commons.qpid.jms.MessageBroker;
-import xqa.commons.qpid.jms.MessageMaker;
+import java.io.UnsupportedEncodingException;
+import java.text.MessageFormat;
+import java.util.List;
+import java.util.UUID;
 
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.TemporaryQueue;
 
-import java.io.UnsupportedEncodingException;
-import java.text.MessageFormat;
-import java.util.List;
-import java.util.UUID;
+import org.apache.commons.codec.digest.DigestUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.gson.Gson;
+
+import xqa.commons.qpid.jms.MessageBroker;
+import xqa.commons.qpid.jms.MessageMaker;
 
 class InserterThread extends Thread {
     private static final Logger logger = LoggerFactory.getLogger(InserterThread.class);
@@ -23,7 +25,7 @@ class InserterThread extends Thread {
     private final Message ingestMessage;
     private MessageBroker inserterThreadMessageBroker;
 
-    public InserterThread(IngestBalancer ingestBalancer, Message ingestMessage) {
+    InserterThread(IngestBalancer ingestBalancer, Message ingestMessage) {
         setName("InserterThread");
         synchronized (this) {
             this.ingestBalancer = ingestBalancer;
@@ -106,7 +108,7 @@ class InserterThread extends Thread {
     }
 
     private synchronized void placeMessageBackOnOriginatingDestination()
-            throws JMSException, UnsupportedEncodingException {
+            throws JMSException, UnsupportedEncodingException, MessageBroker.MessageBrokerException {
         inserterThreadMessageBroker.sendMessage(MessageMaker.createMessage(inserterThreadMessageBroker.getSession(),
                 inserterThreadMessageBroker.getSession().createQueue("xqa.ingest"), ingestMessage.getJMSCorrelationID(),
                 MessageMaker.getBody(ingestMessage)));

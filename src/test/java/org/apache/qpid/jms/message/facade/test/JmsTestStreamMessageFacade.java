@@ -16,11 +16,12 @@
  */
 package org.apache.qpid.jms.message.facade.test;
 
-import org.apache.qpid.jms.message.facade.JmsStreamMessageFacade;
-
-import javax.jms.MessageEOFException;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.jms.MessageEOFException;
+
+import org.apache.qpid.jms.message.facade.JmsStreamMessageFacade;
 
 /**
  * Test implementation of the JmsStreamMessageFacade

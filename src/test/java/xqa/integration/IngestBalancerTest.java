@@ -1,20 +1,21 @@
 package xqa.integration;
 
 
-import org.apache.commons.io.FileUtils;
-import org.junit.jupiter.api.Test;
-import xqa.IngestBalancer;
-import xqa.commons.qpid.jms.MessageBroker;
-import xqa.commons.qpid.jms.MessageMaker;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import javax.jms.JMSException;
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import javax.jms.JMSException;
+
+import org.apache.commons.io.FileUtils;
+import org.junit.jupiter.api.Test;
+
+import xqa.IngestBalancer;
+import xqa.commons.qpid.jms.MessageBroker;
+import xqa.commons.qpid.jms.MessageMaker;
 
 class IngestBalancerTest {
     @Test
@@ -49,7 +50,8 @@ class IngestBalancerTest {
     }
 
     private void sendIngestMessage(String destination,
-                                   MessageBroker messageBroker) throws JMSException, IOException {
+                                   MessageBroker messageBroker) 
+                                           throws JMSException, IOException, MessageBroker.MessageBrokerException {
         messageBroker.sendMessage(MessageMaker.createMessage(
                 messageBroker.getSession(),
                 messageBroker.getSession().createQueue(destination),
@@ -59,7 +61,8 @@ class IngestBalancerTest {
     }
 
     private void sendStopMessage(String destination,
-                                 MessageBroker messageBroker) throws JMSException, UnsupportedEncodingException {
+                                 MessageBroker messageBroker) 
+                                         throws JMSException, UnsupportedEncodingException, MessageBroker.MessageBrokerException {
         messageBroker.sendMessage(MessageMaker.createMessage(
                 messageBroker.getSession(),
                 messageBroker.getSession().createTopic(destination),

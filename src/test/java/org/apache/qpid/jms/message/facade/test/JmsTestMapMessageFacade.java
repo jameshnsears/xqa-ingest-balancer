@@ -16,12 +16,12 @@
  */
 package org.apache.qpid.jms.message.facade.test;
 
-import org.apache.qpid.jms.message.facade.JmsMapMessageFacade;
-
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
+
+import org.apache.qpid.jms.message.facade.JmsMapMessageFacade;
 
 /**
  * Simple implementation of the JmsMapMessageFacade used for testing.

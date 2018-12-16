@@ -1,17 +1,19 @@
 package xqa.integration;
 
-import org.apache.commons.codec.digest.DigestUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import xqa.commons.qpid.jms.MessageBroker;
-import xqa.commons.qpid.jms.MessageLogger;
-import xqa.commons.qpid.jms.MessageMaker;
+import java.util.UUID;
 
 import javax.jms.Destination;
 import javax.jms.Message;
 import javax.jms.MessageConsumer;
 import javax.jms.MessageListener;
-import java.util.UUID;
+
+import org.apache.commons.codec.digest.DigestUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import xqa.commons.qpid.jms.MessageBroker;
+import xqa.commons.qpid.jms.MessageLogger;
+import xqa.commons.qpid.jms.MessageMaker;
 
 class MockShard extends Thread implements Runnable, MessageListener {
     private static final Logger logger = LoggerFactory.getLogger(MockShard.class);
@@ -23,7 +25,7 @@ class MockShard extends Thread implements Runnable, MessageListener {
     private boolean stop = false;
     private Destination insertUuidDestination;
 
-    public MockShard() throws MessageBroker.MessageBrokerException {
+    public MockShard() throws MessageBroker.MessageBrokerException, InterruptedException {
         messageBroker = new MessageBroker("0.0.0.0", 5672, "admin", "admin", 3);
         setName("MockShard");
     }

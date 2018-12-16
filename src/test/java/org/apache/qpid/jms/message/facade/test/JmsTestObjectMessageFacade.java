@@ -16,11 +16,15 @@
  */
 package org.apache.qpid.jms.message.facade.test;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
+import java.util.Arrays;
+
 import org.apache.qpid.jms.message.facade.JmsObjectMessageFacade;
 import org.apache.qpid.jms.util.ClassLoadingAwareObjectInputStream;
-
-import java.io.*;
-import java.util.Arrays;
 
 /**
  * Test implementation for a JMS Object Message Facade.

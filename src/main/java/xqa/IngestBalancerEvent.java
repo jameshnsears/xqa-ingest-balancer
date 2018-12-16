@@ -10,11 +10,11 @@ class IngestBalancerEvent {
     private final String digest;
     private final String state;
 
-    public IngestBalancerEvent(final String serviceId,
-                               final String correlationId,
-                               final int poolSize,
-                               final String digest,
-                               final String state) {
+    IngestBalancerEvent(final String serviceId,
+                        final String correlationId,
+                        final int poolSize,
+                        final String digest,
+                        final String state) {
         this.serviceId = serviceId;
         this.creationTime = new Date().getTime();
         this.correlationId = correlationId;

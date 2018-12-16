@@ -1,18 +1,20 @@
 package xqa;
 
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
+
+import java.util.List;
+import java.util.Vector;
+
+import javax.jms.BytesMessage;
+import javax.jms.Message;
+
 import org.apache.qpid.jms.message.JmsBytesMessage;
 import org.apache.qpid.jms.message.JmsMessageFactory;
 import org.apache.qpid.jms.message.facade.test.JmsTestMessageFactory;
 import org.junit.jupiter.api.Test;
+
 import xqa.commons.qpid.jms.MessageMaker;
-
-import javax.jms.BytesMessage;
-import javax.jms.Message;
-import java.util.List;
-import java.util.Vector;
-
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.mock;
 
 class SmallestShardTest {
     @Test

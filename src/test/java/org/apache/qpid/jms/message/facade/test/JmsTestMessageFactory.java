@@ -16,10 +16,17 @@
  */
 package org.apache.qpid.jms.message.facade.test;
 
-import org.apache.qpid.jms.message.*;
+import java.io.Serializable;
 
 import javax.jms.JMSException;
-import java.io.Serializable;
+
+import org.apache.qpid.jms.message.JmsBytesMessage;
+import org.apache.qpid.jms.message.JmsMapMessage;
+import org.apache.qpid.jms.message.JmsMessage;
+import org.apache.qpid.jms.message.JmsMessageFactory;
+import org.apache.qpid.jms.message.JmsObjectMessage;
+import org.apache.qpid.jms.message.JmsStreamMessage;
+import org.apache.qpid.jms.message.JmsTextMessage;
 
 /**
  * Implementation of the JmsMessageFactory that create simple

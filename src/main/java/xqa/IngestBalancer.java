@@ -1,21 +1,28 @@
 package xqa;
 
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import org.apache.commons.cli.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import xqa.commons.qpid.jms.MessageBroker;
-import xqa.commons.qpid.jms.MessageLogger;
-
-import javax.jms.Destination;
-import javax.jms.Message;
-import javax.jms.MessageConsumer;
-import javax.jms.MessageListener;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
+
+import javax.jms.Destination;
+import javax.jms.Message;
+import javax.jms.MessageConsumer;
+import javax.jms.MessageListener;
+
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
+
+import xqa.commons.qpid.jms.MessageBroker;
+import xqa.commons.qpid.jms.MessageLogger;
 
 
 public class IngestBalancer extends Thread implements MessageListener {
@@ -113,11 +120,13 @@ public class IngestBalancer extends Thread implements MessageListener {
         logger.info("pool_size=" + poolSize);
     }
 
+    /*
     private void showUsage(final Options options) throws CommandLineException {
         HelpFormatter formater = new HelpFormatter();
         formater.printHelp("IngestBalancer", options);
         throw new IngestBalancer.CommandLineException();
     }
+    */
 
     private void initialiseIngestPool() {
         ThreadFactory threadFactory = new ThreadFactoryBuilder().setNameFormat("InserterThread-%d").setDaemon(true)

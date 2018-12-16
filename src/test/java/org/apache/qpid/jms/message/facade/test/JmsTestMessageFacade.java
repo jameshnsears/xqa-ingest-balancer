@@ -16,15 +16,16 @@
  */
 package org.apache.qpid.jms.message.facade.test;
 
-import org.apache.qpid.jms.JmsDestination;
-import org.apache.qpid.jms.message.facade.JmsMessageFacade;
-
-import javax.jms.JMSException;
 import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+
+import javax.jms.JMSException;
+
+import org.apache.qpid.jms.JmsDestination;
+import org.apache.qpid.jms.message.facade.JmsMessageFacade;
 
 /**
  * A test implementation of the JmsMessageFaceade that provides a generic

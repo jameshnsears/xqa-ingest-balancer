@@ -1,4 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <FindBugsFilter>
+    <Class name="xqa.IngestBalancer"/>
+    <And>
+        <Bug category="DM_EXIT"/>
+    </And>
+    <Class name="xqa.IngestBalancer$CommandLineException"/>
+    <And>
+        <Bug category="SIC_INNER_SHOULD_BE_STATIC"/>
+    </And>
+    <Class name="xqa.InserterThread"/>
+    <And>
+        <Bug category="DM_BOXED_PRIMITIVE_FOR_PARSING"/>
+    </And>
 </FindBugsFilter>
