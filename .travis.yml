@@ -5,11 +5,21 @@ sudo: required
 notifications:
 email: james.hn.sears@gmail.com
 
+env:
+  global:
+    # travis encrypt COVERALLS_REPO_TOKEN=...
+    - secure: "JvWuHRi3iTdvPIs/GE4ygL0VbOSr0wbgWGWj1TMV5ij4gNBeHMHaglyq/N3Sic6ExrkFlS6DMeJQlRJvH0XnVIxJt0GYi+CusWEfuoHXVdMiEwHB4OWgo5DzLOeIXI4sws8HfRCic6eX9XlzgIGx4vI24Mdt9jdTubgddgWBS5NVx3fg1ph9Onhia70FDeXGE66HhkanVqpaRVtyGHPrGXJn7Xdk5KoPXa9Gv9VLsO1O7I+4SPcurYbHe+JWqsxIwlQ+DYY7TLnoMxaq/o6K/aONVtVz5Xg+9oawyXD4uN3ulO97mZDwsW8B+rtiud8DxFQz8RUnBSPxCDJZdw+mPJt0ez0MAtvaZsCVVYhVGe2ieXrIeMZkTdFZNZcBN0lG5XeX7o1PNbHOypCg29EDKux3UqXf/LGNV3VQPIzLPFn0QMjmN9dKqir4pJC4dqpbPsXmL+apV29A0nZERlxIUIxtooFc/edF69KSfRYcXq7yvb4Ac2UygODY7Lp3cprd/Z4ma3+OEBYDCNkt8WAc0fAIrVYRqcn9kceGpYp5IUj5TFOELz68Exj7J1+Cbg9klT8ReBFXJ2Il2WJ3c/ODli6T/hzkdgMzN5kK0cGOXqPViCpvqEmFMjOyFYpntEECcNlZXWgbsxCjL+zW4LcdIrzE0sC14yjJmcAZL3L5aTU="
+    # travis encrypt CODACY_PROJECT_TOKEN=...
+    - secure: "rcM228FPAsOTfmlFiJVIsAqzsSmysxpmYjnOB4PsnWiToW5VDeqx5WRfyxnbUf/x5av7twkfGBLY1fOoPT/dAQLj9m8lYEdXbRYmpB4bIMxEHC3idAQ/ZmbGfTeSlWUom15DXRNnIbxxsrF1HSKyFPb1/DabfJJFLrgoXNKQ9D7X6ZNMNd/kDTiU71ku+6IpvR9GMA6bjN8OS1PWtCXLuv3qW2z7gNx4YxF8cB6VVO/d7Rv0tYsgXRmEsE/Tb80gkVxoOJgBrOjiBpgJnpGRRIMmcy9CQhfSCewbY/s2rGnr1hdP+b8a26LgPiNvftrPRrjkc0G0WNkidlPhoF8C81WkptMA5jhK9ijKrLPw4sIx/hr5hO/vLE9Z11MbrI4xHWcCgot5+Vh+6QPcNpzvNTyMHCkTnOcK9f4v1i5lvZ3DK9PcSHmj/EYacchxQ0zmU+LkDjpMTo9Uxtb8DeSAFHYvwQdZPqm8i/hVj7qxhTQyq+k8FJ44TqSBHNMeQ07jRRdvwylJ77/FiU5n+BwVroq9MFTGVVgVdahyfjp3fI6P/GC3I7n/A5WEt6eViK0ymgE1RDZIyoZNYf8YnJKiqr7Vmdc96IqErdhCfCb1GkonQUXFmR2AujoorzTdjsxb3DARigW0YWwV9Ne5SOJjn94Oesh5XvVKyYVQ2mYyjpw="
+
 addons:
   sonarcloud:
     organization: "jameshnsears-github"
     token:
       secure: "J0GyiSZzE4wgWI6JJxzIVIhqOqYz7dn8xWfQhO7cC1Etgr6TTU+JTF3BaV0d59VhKO2o/9ap3zY7oj00bfdaVj0AM70BOj5xE4SlIXNzQdnJmJnvuZQ/Q/o7F1AOTGNX8ItGMCEjEeAdMPBaUVZ9Fo0betIxc2AlJakhxY6nwxTFbbmmOsDiihfDfUHAH5JAOaU5s+/jANosX0OwQJOO/whfOZi2p5eBplr5M6XiXO2Dr/CWPo4H8cWv9qnFyQyH0qYBu6YZT6CY7A5QFnCMhe2RgViNGPHUoBefRzhJldcjR4gCIBDkRGloFshjjKfeYi986Dj63Y1/rc8Mti+1bPnuXOaCoCqCsr8ESPGeNGB2RBgVbz3H/A0Urcwh10d1o4kwdnKlfLJZQLYL+wGXW8aWlPue59Cl44QpNLd7TbcskIPd73I0WHcPwLo+1Y25GfrhUq11uG4FzjWAaLL/CDbtCwZIiryRw9gQB+4xLzVWAyc1MhqDTJS4FgV45vywqWoS6QDyiXT3iRoRgTciv5pOzy1lz6Sy3YgiswzxY+Eqb4m28GqKkDfs02UjACSIxnoRLIv7tX0DcuEF6qt6v9LQwocZu6uF6Fl+Z2vyhF/S/fx6VjMs2SZCQ0fMFifzWI0tKoK0L+2zOXCljK7IC6D0an0RGrRnDmMh7oeL0/o="
+
+git:
+  depth: false
 
 services:
   - docker
@@ -24,6 +34,7 @@ cache:
 
 before_script:
   - docker-compose up -d xqa-message-broker
+  - wget https://github.com/codacy/codacy-coverage-reporter/releases/download/4.0.5/codacy-coverage-reporter-4.0.5-assembly.jar
 
 script:
   - mvn clean test
@@ -31,4 +42,5 @@ script:
 
 after_success:
   - mvn jacoco:report coveralls:report
+  - java -jar codacy-coverage-reporter-4.0.5-assembly.jar report -l Java -r target/site/jacoco/jacoco.xml
   - sonar-scanner

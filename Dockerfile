@@ -1,9 +1,9 @@
 FROM ubuntu:bionic
 
-MAINTAINER james.hn.sears@gmail.com
-
-RUN apt-get -qq update
-RUN apt-get -qq install -y openjdk-11-jre
+RUN apt-get -qq update \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+RUN apt-get -qq install -y --no-install-recommends openjdk-11-jre
 
 RUN apt-get install --reinstall -y locales
 RUN sed -i 's/# en_GB.UTF-8 UTF-8/en_GB.UTF-8 UTF-8/' /etc/locale.gen
