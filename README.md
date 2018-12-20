@@ -1,5 +1,5 @@
 # xqa-ingest-balancer [![Build Status](https://travis-ci.org/jameshnsears/xqa-ingest-balancer.svg?branch=master)](https://travis-ci.org/jameshnsears/xqa-ingest-balancer) [![Coverage Status](https://coveralls.io/repos/github/jameshnsears/xqa-ingest-balancer/badge.svg?branch=master)](https://coveralls.io/github/jameshnsears/xqa-ingest-balancer?branch=master) [![sonarcloud.io](https://sonarcloud.io/api/project_badges/measure?project=jameshnsears_xqa-ingest-balancer&metric=alert_status)](https://sonarcloud.io/dashboard?id=jameshnsears_xqa-ingest-balancer) [![Codacy Badge](https://api.codacy.com/project/badge/Grade/d2624e3cf96045fcb31003094b591fc3)](https://www.codacy.com/app/jameshnsears/xqa-ingest-balancer?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=jameshnsears/xqa-ingest-balancer&amp;utm_campaign=Badge_Grade)
-* evenly distributes the ingested XML across one or more shards.
+* distributes XML across XQA BaseX engine(s).
 
 ![High Level Design](https://github.com/jameshnsears/xqa-documentation/blob/master/uml/ingest-balancer-sequence-diagram.jpg)
 
