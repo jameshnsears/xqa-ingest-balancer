@@ -109,8 +109,12 @@ class InserterThread extends Thread {
 
     private synchronized void placeMessageBackOnOriginatingDestination()
             throws JMSException, UnsupportedEncodingException, MessageBroker.MessageBrokerException {
-        inserterThreadMessageBroker.sendMessage(MessageMaker.createMessage(inserterThreadMessageBroker.getSession(),
-                inserterThreadMessageBroker.getSession().createQueue("xqa.ingest"), ingestMessage.getJMSCorrelationID(),
+        inserterThreadMessageBroker.sendMessage(
+                MessageMaker.createMessage(
+                        inserterThreadMessageBroker.getSession(),
+                        inserterThreadMessageBroker.getSession().createQueue("xqa.ingest"),
+                        ingestMessage.getJMSType(),
+                        ingestMessage.getJMSCorrelationID(),
                 MessageMaker.getBody(ingestMessage)));
     }
 
