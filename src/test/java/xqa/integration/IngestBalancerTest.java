@@ -59,6 +59,36 @@ class IngestBalancerTest {
         messageBroker.close();
     }
 
+    @Test
+    void noResponseFromShard() throws Exception {
+        final IngestBalancer ingestBalancer = new IngestBalancer();
+        ingestBalancer.processCommandLine(new String[]{
+                "-message_broker_host",
+                "0.0.0.0",
+                "-pool_size",
+                "3",
+                "-insert_thread_wait",
+                "500"});
+        ingestBalancer.start();
+
+        final MessageBroker messageBroker = new MessageBroker(
+                "0.0.0.0",
+                5672,
+                "admin",
+                "admin",
+                3);
+
+        sendIngestMessage(ingestBalancer.destinationIngest, messageBroker);
+
+        Thread.sleep(2000);
+
+        sendStopMessage(ingestBalancer.destinationCmdStop, messageBroker);
+
+        ingestBalancer.join();
+
+        messageBroker.close();
+    }
+
     private void sendIngestMessage(final String destination,
                                    final MessageBroker messageBroker)
                                            throws JMSException, IOException, MessageBroker.MessageBrokerException {

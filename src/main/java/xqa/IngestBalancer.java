@@ -1,13 +1,11 @@
 package xqa;
 
-import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 
 import javax.jms.Destination;
-import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageConsumer;
 import javax.jms.MessageListener;
@@ -58,12 +56,12 @@ public class IngestBalancer extends Thread implements MessageListener {
             ingestBalancer.processCommandLine(args);
             ingestBalancer.start();
             ingestBalancer.join();
-        } catch (CommandLineException | InterruptedException | ParseException exception) {
+        } catch (InterruptedException | ParseException exception) {
             logger.error(exception.getMessage());
         }
     }
 
-    public void processCommandLine(final String... args) throws ParseException, CommandLineException {
+    public void processCommandLine(final String... args) throws ParseException {
         final Options options = new Options();
 
         options.addOption("message_broker_host", true, "i.e. xqa-message-broker");
@@ -85,14 +83,11 @@ public class IngestBalancer extends Thread implements MessageListener {
         setConfigurationValues(options, commandLineParser.parse(options, args));
     }
 
-    private void setConfigurationValues(final Options options, final CommandLine commandLine) throws CommandLineException {
+    private void setConfigurationValues(final Options options, final CommandLine commandLine) {
         if (commandLine.hasOption("message_broker_host")) {
             messageBrokerHost = commandLine.getOptionValue("message_broker_host");
             logger.info("message_broker_host=" + messageBrokerHost);
         }
-//        else {
-//            showUsage(options);
-//        }
 
         messageBrokerPort = Integer.parseInt(commandLine.getOptionValue("message_broker_port", "5672"));
         messageBrokerUsername = commandLine.getOptionValue("message_broker_username", "admin");
@@ -109,22 +104,9 @@ public class IngestBalancer extends Thread implements MessageListener {
         insertThreadWait = Integer.parseInt(commandLine.getOptionValue("insert_thread_wait", "60000"));
         logger.info("insert_thread_wait=" + insertThreadWait);
 
-        final Map<String, String> env = System.getenv();
-        if (env.get("POOL_SIZE") != null) {
-            poolSize = Integer.parseInt(env.get("POOL_SIZE"));
-        } else {
-            poolSize = Integer.parseInt(commandLine.getOptionValue("pool_size", "4"));
-        }
+        poolSize = Integer.parseInt(commandLine.getOptionValue("pool_size", "4"));
         logger.info("pool_size=" + poolSize);
     }
-
-    /*
-    private void showUsage(final Options options) throws CommandLineException {
-        HelpFormatter formater = new HelpFormatter();
-        formater.printHelp("IngestBalancer", options);
-        throw new IngestBalancer.CommandLineException();
-    }
-    */
 
     private void initialiseIngestPool() {
         final ThreadFactory threadFactory = new ThreadFactoryBuilder().setNameFormat("InserterThread-%d").setDaemon(true)
@@ -143,8 +125,6 @@ public class IngestBalancer extends Thread implements MessageListener {
             }
 
             messageBroker.close();
-        } catch (InterruptedException | JMSException exception) {
-            logger.error(exception.getMessage());
         } catch (Exception exception) {
             logger.error(exception.getMessage());
         } finally {
@@ -184,12 +164,6 @@ public class IngestBalancer extends Thread implements MessageListener {
             }
         } catch (Exception exception) {
             logger.error(exception.getMessage());
-        }
-    }
-
-    @SuppressWarnings("serial")
-    public class CommandLineException extends Exception {
-        public CommandLineException() {
         }
     }
 }
