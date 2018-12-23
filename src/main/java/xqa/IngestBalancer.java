@@ -6,10 +6,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 
-import javax.jms.Destination;
-import javax.jms.Message;
-import javax.jms.MessageConsumer;
-import javax.jms.MessageListener;
+import javax.jms.*;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -42,7 +39,7 @@ public class IngestBalancer extends Thread implements MessageListener {
     public int messageBrokerRetryAttempts;
     public int insertThreadWait;
     public int insertThreadSecondaryWait;
-    private boolean stop = false;
+    private boolean stop;
     private ThreadPoolExecutor ingestPoolExecutor;
 
     public IngestBalancer() {
@@ -51,22 +48,19 @@ public class IngestBalancer extends Thread implements MessageListener {
         setName("IngestBalancer");
     }
 
-    public static void main(String[] args) {
+    public static void main(final String... args) {
         try {
-            IngestBalancer ingestBalancer = new IngestBalancer();
+            final IngestBalancer ingestBalancer = new IngestBalancer();
             ingestBalancer.processCommandLine(args);
             ingestBalancer.start();
             ingestBalancer.join();
-        } catch (CommandLineException exception) {
-            System.exit(0);
-        } catch (Exception exception) {
+        } catch (CommandLineException | InterruptedException | ParseException exception) {
             logger.error(exception.getMessage());
-            System.exit(0);
         }
     }
 
-    public void processCommandLine(String[] args) throws ParseException, CommandLineException {
-        Options options = new Options();
+    public void processCommandLine(final String... args) throws ParseException, CommandLineException {
+        final Options options = new Options();
 
         options.addOption("message_broker_host", true, "i.e. xqa-message-broker");
         options.addOption("message_broker_port", true, "i.e. 5672");
@@ -83,18 +77,18 @@ public class IngestBalancer extends Thread implements MessageListener {
         options.addOption("insert_thread_wait", true, "i.e. 10000");            // 10 seconds
         options.addOption("insert_thread_secondary_wait", true, "i.e. 1000");   // 1 second
 
-        CommandLineParser commandLineParser = new DefaultParser();
+        final CommandLineParser commandLineParser = new DefaultParser();
         setConfigurationValues(options, commandLineParser.parse(options, args));
     }
 
-    private void setConfigurationValues(Options options, CommandLine commandLine) throws CommandLineException {
+    private void setConfigurationValues(final Options options, final CommandLine commandLine) throws CommandLineException {
         if (commandLine.hasOption("message_broker_host")) {
             messageBrokerHost = commandLine.getOptionValue("message_broker_host");
             logger.info("message_broker_host=" + messageBrokerHost);
-        } else {
-            //showUsage(options);
-            messageBrokerHost = commandLine.getOptionValue("message_broker_host", "127.0.0.1");
         }
+//        else {
+//            showUsage(options);
+//        }
 
         messageBrokerPort = Integer.parseInt(commandLine.getOptionValue("message_broker_port", "5672"));
         messageBrokerUsername = commandLine.getOptionValue("message_broker_username", "admin");
@@ -111,7 +105,7 @@ public class IngestBalancer extends Thread implements MessageListener {
         insertThreadWait = Integer.parseInt(commandLine.getOptionValue("insert_thread_wait", "60000"));
         logger.info("insert_thread_wait=" + insertThreadWait);
 
-        Map<String, String> env = System.getenv();
+        final Map<String, String> env = System.getenv();
         if (env.get("POOL_SIZE") != null) {
             poolSize = Integer.parseInt(env.get("POOL_SIZE"));
         } else {
@@ -129,7 +123,7 @@ public class IngestBalancer extends Thread implements MessageListener {
     */
 
     private void initialiseIngestPool() {
-        ThreadFactory threadFactory = new ThreadFactoryBuilder().setNameFormat("InserterThread-%d").setDaemon(true)
+        final ThreadFactory threadFactory = new ThreadFactoryBuilder().setNameFormat("InserterThread-%d").setDaemon(true)
                 .build();
 
         ingestPoolExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(poolSize, threadFactory);
@@ -145,9 +139,10 @@ public class IngestBalancer extends Thread implements MessageListener {
             }
 
             messageBroker.close();
+        } catch (InterruptedException | JMSException exception) {
+            logger.error(exception.getMessage());
         } catch (Exception exception) {
             logger.error(exception.getMessage());
-            System.exit(1);
         } finally {
             ingestPoolExecutor.shutdown();
         }
@@ -161,18 +156,18 @@ public class IngestBalancer extends Thread implements MessageListener {
                 messageBrokerPassword,
                 messageBrokerRetryAttempts);
 
-        Destination cmdStop = messageBroker.getSession().createTopic(destinationCmdStop);
-        MessageConsumer cmdStopConsumer = messageBroker.getSession().createConsumer(cmdStop);
+        final Destination cmdStop = messageBroker.getSession().createTopic(destinationCmdStop);
+        final MessageConsumer cmdStopConsumer = messageBroker.getSession().createConsumer(cmdStop);
         cmdStopConsumer.setMessageListener(this);
 
-        Destination ingest = messageBroker.getSession().createQueue(destinationIngest);
-        MessageConsumer ingestConsumer = messageBroker.getSession().createConsumer(ingest);
+        final Destination ingest = messageBroker.getSession().createQueue(destinationIngest);
+        final MessageConsumer ingestConsumer = messageBroker.getSession().createConsumer(ingest);
         ingestConsumer.setMessageListener(this);
 
         logger.info("listeners registered");
     }
 
-    public void onMessage(Message message) {
+    public void onMessage(final Message message) {
         try {
             if (message.getJMSDestination().toString().equals(destinationCmdStop)) {
                 logger.info(MessageLogger.log(MessageLogger.Direction.RECEIVE, message, false));
@@ -185,8 +180,6 @@ public class IngestBalancer extends Thread implements MessageListener {
             }
         } catch (Exception exception) {
             logger.error(exception.getMessage());
-            exception.printStackTrace();
-            System.exit(1);
         }
     }
 

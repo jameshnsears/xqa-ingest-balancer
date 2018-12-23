@@ -20,18 +20,25 @@ import xqa.commons.qpid.jms.MessageMaker;
 class IngestBalancerTest {
     @Test
     void singleIngest() throws Exception {
-        IngestBalancer ingestBalancer = new IngestBalancer();
-        String messageBrokerHost = "0.0.0.0";
+        final IngestBalancer ingestBalancer = new IngestBalancer();
         ingestBalancer.processCommandLine(new String[]{
-                "-message_broker_host", messageBrokerHost,
-                "-pool_size", "3",
-                "-insert_thread_wait", "10000"});
+                "-message_broker_host",
+                "0.0.0.0",
+                "-pool_size",
+                "3",
+                "-insert_thread_wait",
+                "10000"});
         ingestBalancer.start();
 
-        MockShard mockShard = new MockShard();
+        final MockShard mockShard = new MockShard();
         mockShard.start();
 
-        MessageBroker messageBroker = new MessageBroker(messageBrokerHost, 5672, "admin", "admin", 3);
+        final MessageBroker messageBroker = new MessageBroker(
+                "0.0.0.0",
+                5672,
+                "admin",
+                "admin",
+                3);
 
         sendIngestMessage(ingestBalancer.destinationIngest, messageBroker);
 
@@ -39,7 +46,10 @@ class IngestBalancerTest {
             Thread.sleep(1000);
         }
 
-        assertEquals("192a0c3918e308c1374d57256b183045393c1cf9053a8614e9d7bb24b8261358", mockShard.digestOfMostRecentMessage);
+        assertEquals(
+                "192a0c3918e308c1374d57256b183045393c1cf9053a8614e9d7bb24b8261358",
+                mockShard.digestOfMostRecentMessage,
+                "digest does not match");
 
         sendStopMessage(ingestBalancer.destinationCmdStop, messageBroker);
 
@@ -49,8 +59,8 @@ class IngestBalancerTest {
         messageBroker.close();
     }
 
-    private void sendIngestMessage(String destination,
-                                   MessageBroker messageBroker) 
+    private void sendIngestMessage(final String destination,
+                                   final MessageBroker messageBroker)
                                            throws JMSException, IOException, MessageBroker.MessageBrokerException {
         messageBroker.sendMessage(MessageMaker.createMessage(
                 messageBroker.getSession(),
@@ -60,8 +70,8 @@ class IngestBalancerTest {
                 xmlFileContents()));
     }
 
-    private void sendStopMessage(String destination,
-                                 MessageBroker messageBroker) 
+    private void sendStopMessage(final String destination,
+                                 final MessageBroker messageBroker)
                                          throws JMSException, UnsupportedEncodingException, MessageBroker.MessageBrokerException {
         messageBroker.sendMessage(MessageMaker.createMessage(
                 messageBroker.getSession(),

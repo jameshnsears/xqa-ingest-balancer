@@ -3,8 +3,8 @@ package xqa;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
 
 import javax.jms.BytesMessage;
 import javax.jms.Message;
@@ -19,28 +19,29 @@ import xqa.commons.qpid.jms.MessageMaker;
 class SmallestShardTest {
     @Test
     void findSmallestShard() throws Exception {
-        IngestBalancer ingestBalancer = new IngestBalancer();
+        final IngestBalancer ingestBalancer = new IngestBalancer();
         ingestBalancer.processCommandLine(new String[]{"-message_broker_host", "127.0.0.1"});
 
-        InserterThread inserterThread = new InserterThread(ingestBalancer, mock(BytesMessage.class));
+        final InserterThread inserterThread = new InserterThread(ingestBalancer, mock(BytesMessage.class));
 
-        List<Message> shardSizeResponses = new Vector<>();
+        final List<Message> shardSizeResponses = new ArrayList<>();
 
-        JmsMessageFactory factory = new JmsTestMessageFactory();
+        final JmsMessageFactory factory = new JmsTestMessageFactory();
 
-        JmsBytesMessage big = factory.createBytesMessage();
+        final JmsBytesMessage big = factory.createBytesMessage();
         big.writeBytes("10".getBytes());
         shardSizeResponses.add(big);
 
-        JmsBytesMessage smallest = factory.createBytesMessage();
+        final JmsBytesMessage smallest = factory.createBytesMessage();
         smallest.writeBytes("5".getBytes());
         shardSizeResponses.add(smallest);
 
-        JmsBytesMessage bigger = factory.createBytesMessage();
+        final JmsBytesMessage bigger = factory.createBytesMessage();
         bigger.writeBytes("30".getBytes());
         shardSizeResponses.add(bigger);
 
         assertEquals(
+                "unable to find smallest shard size reponse",
                 MessageMaker.getBody(smallest),
                 MessageMaker.getBody(inserterThread.findSmallestShard(shardSizeResponses)));
     }

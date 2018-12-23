@@ -22,7 +22,7 @@ class MockShard extends Thread implements Runnable, MessageListener {
     private final String destinationCmdStop = "xqa.cmd.stop";
     public String digestOfMostRecentMessage;
     private MessageBroker messageBroker;
-    private boolean stop = false;
+    private boolean stop;
     private Destination insertUuidDestination;
 
     public MockShard() throws MessageBroker.MessageBrokerException, InterruptedException {
@@ -38,8 +38,6 @@ class MockShard extends Thread implements Runnable, MessageListener {
                 Thread.sleep(500);
             } catch (Exception exception) {
                 logger.error(exception.getMessage());
-                exception.printStackTrace();
-                System.exit(1);
             }
         }
 
@@ -47,19 +45,17 @@ class MockShard extends Thread implements Runnable, MessageListener {
             messageBroker.close();
         } catch (Exception exception) {
             logger.error(exception.getMessage());
-            exception.printStackTrace();
-            System.exit(1);
         }
     }
 
     private void registerListeners() {
         try {
-            Destination cmdStopDestination = messageBroker.getSession().createTopic(destinationCmdStop);
-            MessageConsumer cmdStopConsumer = messageBroker.getSession().createConsumer(cmdStopDestination);
+            final Destination cmdStopDestination = messageBroker.getSession().createTopic(destinationCmdStop);
+            final MessageConsumer cmdStopConsumer = messageBroker.getSession().createConsumer(cmdStopDestination);
             cmdStopConsumer.setMessageListener(this);
 
-            Destination sizeDestination = messageBroker.getSession().createTopic(destinationShardSize);
-            MessageConsumer sizeConsumer = messageBroker.getSession().createConsumer(sizeDestination);
+            final Destination sizeDestination = messageBroker.getSession().createTopic(destinationShardSize);
+            final MessageConsumer sizeConsumer = messageBroker.getSession().createConsumer(sizeDestination);
             sizeConsumer.setMessageListener(this);
 
             synchronized (this) {
@@ -70,12 +66,10 @@ class MockShard extends Thread implements Runnable, MessageListener {
             }
         } catch (Exception exception) {
             logger.error(exception.getMessage());
-            exception.printStackTrace();
-            System.exit(1);
         }
     }
 
-    public void onMessage(Message message) {
+    public void onMessage(final Message message) {
         try {
             switch (message.getJMSDestination().toString()) {
                 case destinationCmdStop:
@@ -95,12 +89,10 @@ class MockShard extends Thread implements Runnable, MessageListener {
             }
         } catch (Exception exception) {
             logger.error(exception.getMessage());
-            exception.printStackTrace();
-            System.exit(1);
         }
     }
 
-    private void sendSizeReply(Message message) throws Exception {
+    private void sendSizeReply(final Message message) throws Exception {
         messageBroker.sendMessage(MessageMaker.createMessage(
                 messageBroker.getSession(),
                 message.getJMSReplyTo(),
