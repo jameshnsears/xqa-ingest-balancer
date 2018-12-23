@@ -109,13 +109,19 @@ class InserterThread extends Thread {
 
     private synchronized void placeMessageBackOnOriginatingDestination()
             throws JMSException, UnsupportedEncodingException, MessageBroker.MessageBrokerException {
-        inserterThreadMessageBroker.sendMessage(
+        Message message =
                 MessageMaker.createMessage(
                         inserterThreadMessageBroker.getSession(),
                         inserterThreadMessageBroker.getSession().createQueue("xqa.ingest"),
-                        ingestMessage.getJMSType(),
                         ingestMessage.getJMSCorrelationID(),
-                MessageMaker.getBody(ingestMessage)));
+                        ingestMessage.getJMSType(),
+                        MessageMaker.getBody(ingestMessage));
+
+        logger.warn(message.getJMSCorrelationID());
+        logger.warn(message.getJMSType());
+        logger.warn(DigestUtils.sha256Hex(MessageMaker.getBody(message)));
+
+        inserterThreadMessageBroker.sendMessage(message);
     }
 
     public Message findSmallestShard(List<Message> shardSizeResponses) throws Exception {
