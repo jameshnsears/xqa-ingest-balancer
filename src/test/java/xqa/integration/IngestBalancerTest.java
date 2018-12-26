@@ -10,14 +10,37 @@ import java.util.UUID;
 
 import javax.jms.JMSException;
 
+import com.github.jameshnsears.configuration.ConfigurationAccessor;
+import com.github.jameshnsears.configuration.ConfigurationParameterResolver;
+import com.github.jameshnsears.docker.DockerClient;
 import org.apache.commons.io.FileUtils;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import org.junit.jupiter.api.extension.ExtendWith;
 import xqa.IngestBalancer;
 import xqa.commons.qpid.jms.MessageBroker;
 import xqa.commons.qpid.jms.MessageMaker;
 
+@ExtendWith(ConfigurationParameterResolver.class)
 class IngestBalancerTest {
+    private DockerClient dockerClient;
+
+    @BeforeEach
+    public void startMessageBroker(final ConfigurationAccessor configurationAccessor)
+            throws IOException {
+        dockerClient = new DockerClient();
+        dockerClient.pull(configurationAccessor.images());
+        dockerClient.startContainers(configurationAccessor);
+    }
+
+    @AfterEach
+    public void stopMessageBroker(final ConfigurationAccessor configurationAccessor)
+            throws IOException {
+        dockerClient.rmContainers(configurationAccessor);
+    }
+
     @Test
     void singleIngest() throws Exception {
         final IngestBalancer ingestBalancer = new IngestBalancer();

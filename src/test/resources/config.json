@@ -1,0 +1,11 @@
+[
+  {
+    "image": "jameshnsears/xqa-message-broker:latest",
+    "name": "xqa-message-broker",
+    "ports": {
+      "5672/tcp": 5672,
+      "8161/tcp": 8161
+    },
+    "network": "xqa"
+  }
+]

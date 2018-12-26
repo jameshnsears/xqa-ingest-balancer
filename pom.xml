@@ -72,6 +72,12 @@
         </dependency>
         -->
         <dependency>
+            <groupId>com.github.jameshnsears</groupId>
+            <artifactId>junit-docker-http</artifactId>
+            <version>1.1</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-engine</artifactId>
             <version>5.3.2</version>

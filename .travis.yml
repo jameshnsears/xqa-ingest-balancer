@@ -25,7 +25,7 @@ services:
   - docker
 
 jdk:
-  - openjdk11
+  - openjdk10
 
 cache:
   directories:
@@ -33,7 +33,6 @@ cache:
     - $HOME/.sonar/cache
 
 before_script:
-  - docker-compose up -d xqa-message-broker
   - wget https://github.com/codacy/codacy-coverage-reporter/releases/download/4.0.5/codacy-coverage-reporter-4.0.5-assembly.jar
 
 script:
