@@ -50,18 +50,11 @@ public class IngestBalancer extends Thread implements MessageListener {
         setName("IngestBalancer");
     }
 
-    public static void main(final String... args) {
-        try {
-            final IngestBalancer ingestBalancer = new IngestBalancer();
-            ingestBalancer.processCommandLine(args);
-            ingestBalancer.start();
-            ingestBalancer.join();
-        } catch (InterruptedException exception) {
-            logger.error(exception.getMessage());
-            Thread.currentThread().interrupt();
-        } catch (ParseException exception) {
-            logger.error(exception.getMessage());
-        }
+    public static void main(final String... args) throws ParseException, InterruptedException {
+        final IngestBalancer ingestBalancer = new IngestBalancer();
+        ingestBalancer.processCommandLine(args);
+        ingestBalancer.start();
+        ingestBalancer.join();
     }
 
     public void processCommandLine(final String... args) throws ParseException {
