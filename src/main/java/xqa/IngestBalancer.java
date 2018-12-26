@@ -56,7 +56,10 @@ public class IngestBalancer extends Thread implements MessageListener {
             ingestBalancer.processCommandLine(args);
             ingestBalancer.start();
             ingestBalancer.join();
-        } catch (InterruptedException | ParseException exception) {
+        } catch (InterruptedException exception) {
+            logger.error(exception.getMessage());
+            Thread.currentThread().interrupt();
+        } catch (ParseException exception) {
             logger.error(exception.getMessage());
         }
     }
