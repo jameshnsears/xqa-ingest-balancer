@@ -88,7 +88,7 @@ public class IngestBalancer extends Thread implements MessageListener {
         messageBrokerPort = Integer.parseInt(commandLine.getOptionValue("message_broker_port", "5672"));
         messageBrokerUsername = commandLine.getOptionValue("message_broker_username", "admin");
         messageBrokerPassword = commandLine.getOptionValue("message_broker_password", "admin");
-        messageBrokerRetryAttempts = Integer.parseInt(commandLine.getOptionValue("message_broker_retry", "3"));
+        messageBrokerRetryAttempts = Integer.parseInt(commandLine.getOptionValue("message_broker_retry", "10"));
 
         destinationIngest = commandLine.getOptionValue("destination_ingest", "xqa.ingest");
         destinationEvent = commandLine.getOptionValue("destination_event", "xqa.event");

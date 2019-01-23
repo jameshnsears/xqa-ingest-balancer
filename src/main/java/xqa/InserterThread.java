@@ -108,6 +108,8 @@ class InserterThread extends Thread {
 
     private synchronized void placeMessageBackOnOriginatingDestination()
             throws JMSException, MessageBroker.MessageBrokerException {
+        logger.warn("placeMessageBackOnOriginatingDestination");
+
         final Message message =
                 MessageMaker.createMessage(
                         inserterThreadMessageBroker.getSession(),
