@@ -88,8 +88,7 @@ class InserterThread extends Thread {
     }
 
     private synchronized List<Message> getSizeResponses(final MessageBroker shardSizeMessageBroker,
-                                                        final TemporaryQueue sizeReplyTo)
-                                                            throws JMSException, MessageBrokerException {
+            final TemporaryQueue sizeReplyTo) throws JMSException, MessageBrokerException {
 
         logger.debug(MessageFormat.format("{0}: START", ingestMessage.getJMSCorrelationID()));
 
@@ -109,17 +108,14 @@ class InserterThread extends Thread {
         return shardSizeResponses;
     }
 
-    private void placeMessageBackOnOriginatingDestination()
-            throws JMSException, MessageBroker.MessageBrokerException {
+    private void placeMessageBackOnOriginatingDestination() throws JMSException, MessageBroker.MessageBrokerException {
         logger.warn("placeMessageBackOnOriginatingDestination");
 
-        synchronized(this) {
-            final Message message = MessageMaker.createMessage(
-                inserterThreadMessageBroker.getSession(),
-                inserterThreadMessageBroker.getSession().createQueue("xqa.ingest"),
-                ingestMessage.getJMSCorrelationID(),
-                ingestMessage.getJMSType(),
-                MessageMaker.getBody(ingestMessage));
+        synchronized (this) {
+            final Message message = MessageMaker.createMessage(inserterThreadMessageBroker.getSession(),
+                    inserterThreadMessageBroker.getSession().createQueue("xqa.ingest"),
+                    ingestMessage.getJMSCorrelationID(), ingestMessage.getJMSType(),
+                    MessageMaker.getBody(ingestMessage));
 
             logger.warn(message.getJMSCorrelationID());
             logger.warn(message.getJMSType());
@@ -147,7 +143,7 @@ class InserterThread extends Thread {
     }
 
     private void insert(final Message smallestShard) throws JMSException, MessageBrokerException {
-        synchronized(this) {
+        synchronized (this) {
             final Message message = MessageMaker.createMessage(inserterThreadMessageBroker.getSession(),
                     inserterThreadMessageBroker.getSession().createQueue(smallestShard.getJMSReplyTo().toString()),
                     ingestMessage.getJMSCorrelationID(), MessageMaker.getSubject(ingestMessage),
