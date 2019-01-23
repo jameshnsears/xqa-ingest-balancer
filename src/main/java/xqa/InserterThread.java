@@ -88,7 +88,8 @@ class InserterThread extends Thread {
     }
 
     private synchronized List<Message> getSizeResponses(final MessageBroker shardSizeMessageBroker,
-                                                        final TemporaryQueue sizeReplyToDestination) throws JMSException, MessageBrokerException {
+                                                        final TemporaryQueue sizeReplyToDestination)
+                                                            throws JMSException, MessageBrokerException {
 
         logger.debug(MessageFormat.format("{0}: START", ingestMessage.getJMSCorrelationID()));
 
