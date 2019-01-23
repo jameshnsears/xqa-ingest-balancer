@@ -16,7 +16,7 @@ import xqa.commons.qpid.jms.MessageLogger;
 import xqa.commons.qpid.jms.MessageMaker;
 
 class MockShard extends Thread implements Runnable, MessageListener {
-    private static final Logger logger = LoggerFactory.getLogger(MockShard.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MockShard.class);
     private final String destinationInsertRoot = "xqa.shard.insert.";
     private final String destinationShardSize = "xqa.shard.size";
     private final String destinationCmdStop = "xqa.cmd.stop";
@@ -26,7 +26,7 @@ class MockShard extends Thread implements Runnable, MessageListener {
     private Destination insertUuidDestination;
 
     public MockShard() throws MessageBroker.MessageBrokerException, InterruptedException {
-        messageBroker = new MessageBroker("0.0.0.0", 5672, "admin", "admin", 3);
+        messageBroker = new MessageBroker("0.0.0.0", 5672, "admin", "admin", 10);
         setName("MockShard");
     }
 
@@ -37,14 +37,14 @@ class MockShard extends Thread implements Runnable, MessageListener {
             try {
                 Thread.sleep(500);
             } catch (Exception exception) {
-                logger.error(exception.getMessage());
+                LOGGER.error(exception.getMessage());
             }
         }
 
         try {
             messageBroker.close();
         } catch (Exception exception) {
-            logger.error(exception.getMessage());
+            LOGGER.error(exception.getMessage());
         }
     }
 
@@ -65,7 +65,7 @@ class MockShard extends Thread implements Runnable, MessageListener {
                 insertUuidConsumer.setMessageListener(this);
             }
         } catch (Exception exception) {
-            logger.error(exception.getMessage());
+            LOGGER.error(exception.getMessage());
         }
     }
 
@@ -73,22 +73,22 @@ class MockShard extends Thread implements Runnable, MessageListener {
         try {
             switch (message.getJMSDestination().toString()) {
                 case destinationCmdStop:
-                    logger.debug(MessageLogger.log(MessageLogger.Direction.RECEIVE, message, false));
+                    LOGGER.debug(MessageLogger.log(MessageLogger.Direction.RECEIVE, message, false));
                     stop = true;
                     break;
                 case destinationShardSize:
-                    logger.debug(MessageLogger.log(MessageLogger.Direction.RECEIVE, message, false));
+                    LOGGER.debug(MessageLogger.log(MessageLogger.Direction.RECEIVE, message, false));
                     sendSizeReply(message);
                     break;
                 default:
-                    logger.debug(MessageLogger.log(MessageLogger.Direction.RECEIVE, message, true));
+                    LOGGER.debug(MessageLogger.log(MessageLogger.Direction.RECEIVE, message, true));
                     synchronized (this) {
                         digestOfMostRecentMessage = DigestUtils.sha256Hex(MessageMaker.getBody(message));
                     }
                     break;
             }
         } catch (Exception exception) {
-            logger.error(exception.getMessage());
+            LOGGER.error(exception.getMessage());
         }
     }
 

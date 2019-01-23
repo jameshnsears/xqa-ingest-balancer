@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import com.google.gson.Gson;
 
 import xqa.commons.qpid.jms.MessageBroker;
+import xqa.commons.qpid.jms.MessageBroker.MessageBrokerException;
 import xqa.commons.qpid.jms.MessageMaker;
 
 class InserterThread extends Thread {
@@ -32,6 +33,7 @@ class InserterThread extends Thread {
         }
     }
 
+    @Override
     public void run() {
         threadInstances++;
 
@@ -64,7 +66,7 @@ class InserterThread extends Thread {
         logger.debug("++++++++++++");
     }
 
-    private synchronized void sendEventToMessageBroker(final String state) throws Exception {
+    private synchronized void sendEventToMessageBroker(final String state) throws JMSException, MessageBrokerException {
         final Message message = MessageMaker.createMessage(inserterThreadMessageBroker.getSession(),
                 inserterThreadMessageBroker.getSession().createQueue(ingestBalancer.destinationEvent),
                 UUID.randomUUID().toString(),
@@ -86,7 +88,7 @@ class InserterThread extends Thread {
     }
 
     private synchronized List<Message> getSizeResponses(final MessageBroker shardSizeMessageBroker,
-                                                        final TemporaryQueue sizeReplyToDestination) throws Exception {
+                                                        final TemporaryQueue sizeReplyToDestination) throws JMSException, MessageBrokerException {
 
         logger.debug(MessageFormat.format("{0}: START", ingestMessage.getJMSCorrelationID()));
 
@@ -125,7 +127,7 @@ class InserterThread extends Thread {
         inserterThreadMessageBroker.sendMessage(message);
     }
 
-    public Message findSmallestShard(final List<Message> shardSizeResponses) throws Exception {
+    public Message findSmallestShard(final List<Message> shardSizeResponses) throws JMSException {
         Message smallestShard = null;
 
         if (!shardSizeResponses.isEmpty()) {
@@ -142,7 +144,7 @@ class InserterThread extends Thread {
         return smallestShard;
     }
 
-    private synchronized void insert(final Message smallestShard) throws Exception {
+    private synchronized void insert(final Message smallestShard) throws JMSException, MessageBrokerException {
         final Message message = MessageMaker.createMessage(inserterThreadMessageBroker.getSession(),
                 inserterThreadMessageBroker.getSession().createQueue(smallestShard.getJMSReplyTo().toString()),
                 ingestMessage.getJMSCorrelationID(), MessageMaker.getSubject(ingestMessage),

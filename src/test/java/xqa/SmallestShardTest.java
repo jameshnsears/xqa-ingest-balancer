@@ -7,8 +7,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.jms.BytesMessage;
+import javax.jms.JMSException;
 import javax.jms.Message;
 
+import org.apache.commons.cli.ParseException;
 import org.apache.qpid.jms.message.JmsBytesMessage;
 import org.apache.qpid.jms.message.JmsMessageFactory;
 import org.apache.qpid.jms.message.facade.test.JmsTestMessageFactory;
@@ -18,7 +20,7 @@ import xqa.commons.qpid.jms.MessageMaker;
 
 class SmallestShardTest {
     @Test
-    void findSmallestShard() throws Exception {
+    void findSmallestShard() throws JMSException, ParseException  {
         final IngestBalancer ingestBalancer = new IngestBalancer();
         ingestBalancer.processCommandLine(new String[]{"-message_broker_host", "127.0.0.1"});
 

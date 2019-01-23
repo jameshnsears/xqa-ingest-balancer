@@ -6,6 +6,7 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 
 import javax.jms.Destination;
+import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageConsumer;
 import javax.jms.MessageListener;
@@ -21,11 +22,12 @@ import org.slf4j.LoggerFactory;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
 import xqa.commons.qpid.jms.MessageBroker;
+import xqa.commons.qpid.jms.MessageBroker.MessageBrokerException;
 import xqa.commons.qpid.jms.MessageLogger;
 
 
 public class IngestBalancer extends Thread implements MessageListener {
-    private static final Logger logger = LoggerFactory.getLogger(IngestBalancer.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(IngestBalancer.class);
     public final String serviceId;
 
     private MessageBroker messageBroker;
@@ -46,7 +48,7 @@ public class IngestBalancer extends Thread implements MessageListener {
 
     public IngestBalancer() {
         serviceId = this.getClass().getSimpleName().toLowerCase() + "/" + UUID.randomUUID().toString().split("-")[0];
-        logger.info(serviceId);
+        LOGGER.info(serviceId);
         setName("IngestBalancer");
     }
 
@@ -82,7 +84,7 @@ public class IngestBalancer extends Thread implements MessageListener {
     private void setConfigurationValues(final Options options, final CommandLine commandLine) {
         if (commandLine.hasOption("message_broker_host")) {
             messageBrokerHost = commandLine.getOptionValue("message_broker_host");
-            logger.info("message_broker_host=" + messageBrokerHost);
+            LOGGER.info("message_broker_host=" + messageBrokerHost);
         }
 
         messageBrokerPort = Integer.parseInt(commandLine.getOptionValue("message_broker_port", "5672"));
@@ -95,13 +97,13 @@ public class IngestBalancer extends Thread implements MessageListener {
         destinationShardSize = commandLine.getOptionValue("destination_shard_size", "xqa.shard.size");
 
         insertThreadSecondaryWait = Integer.parseInt(commandLine.getOptionValue("insert_thread_secondary_wait", "5000"));
-        logger.info("insert_thread_secondary_wait=" + insertThreadSecondaryWait);
+        LOGGER.info("insert_thread_secondary_wait=" + insertThreadSecondaryWait);
 
         insertThreadWait = Integer.parseInt(commandLine.getOptionValue("insert_thread_wait", "60000"));
-        logger.info("insert_thread_wait=" + insertThreadWait);
+        LOGGER.info("insert_thread_wait=" + insertThreadWait);
 
         poolSize = Integer.parseInt(commandLine.getOptionValue("pool_size", "4"));
-        logger.info("pool_size=" + poolSize);
+        LOGGER.info("pool_size=" + poolSize);
     }
 
     private void initialiseIngestPool() {
@@ -111,6 +113,7 @@ public class IngestBalancer extends Thread implements MessageListener {
         ingestPoolExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(poolSize, threadFactory);
     }
 
+    @Override
     public void run() {
         try {
             initialiseIngestPool();
@@ -122,13 +125,13 @@ public class IngestBalancer extends Thread implements MessageListener {
 
             messageBroker.close();
         } catch (Exception exception) {
-            logger.error(exception.getMessage());
+            LOGGER.error(exception.getMessage());
         } finally {
             ingestPoolExecutor.shutdown();
         }
     }
 
-    private void registerListeners() throws Exception {
+    private void registerListeners() throws JMSException, MessageBrokerException, InterruptedException  {
         messageBroker = new MessageBroker(
                 messageBrokerHost,
                 messageBrokerPort,
@@ -144,22 +147,22 @@ public class IngestBalancer extends Thread implements MessageListener {
         final MessageConsumer ingestConsumer = messageBroker.getSession().createConsumer(ingest);
         ingestConsumer.setMessageListener(this);
 
-        logger.info("listeners registered");
+        LOGGER.info("listeners registered");
     }
 
     public void onMessage(final Message message) {
         try {
             if (message.getJMSDestination().toString().equals(destinationCmdStop)) {
-                logger.info(MessageLogger.log(MessageLogger.Direction.RECEIVE, message, false));
+                LOGGER.info(MessageLogger.log(MessageLogger.Direction.RECEIVE, message, false));
                 stop = true;
             }
 
             if (message.getJMSDestination().toString().equals(destinationIngest)) {
-                logger.info(MessageLogger.log(MessageLogger.Direction.RECEIVE, message, true));
+                LOGGER.info(MessageLogger.log(MessageLogger.Direction.RECEIVE, message, true));
                 ingestPoolExecutor.execute(new InserterThread(this, message));
             }
         } catch (Exception exception) {
-            logger.error(exception.getMessage());
+            LOGGER.error(exception.getMessage());
         }
     }
 }

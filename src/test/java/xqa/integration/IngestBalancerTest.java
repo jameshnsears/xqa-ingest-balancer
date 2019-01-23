@@ -10,15 +10,16 @@ import java.util.UUID;
 
 import javax.jms.JMSException;
 
-import com.github.jameshnsears.configuration.ConfigurationAccessor;
-import com.github.jameshnsears.configuration.ConfigurationParameterResolver;
-import com.github.jameshnsears.docker.DockerClient;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
 import org.junit.jupiter.api.extension.ExtendWith;
+
+import com.github.jameshnsears.configuration.ConfigurationAccessor;
+import com.github.jameshnsears.configuration.ConfigurationParameterResolver;
+import com.github.jameshnsears.docker.DockerClient;
+
 import xqa.IngestBalancer;
 import xqa.commons.qpid.jms.MessageBroker;
 import xqa.commons.qpid.jms.MessageMaker;
@@ -61,7 +62,7 @@ class IngestBalancerTest {
                 5672,
                 "admin",
                 "admin",
-                3);
+                10);
 
         sendIngestMessage(ingestBalancer.destinationIngest, messageBroker);
 
@@ -99,7 +100,7 @@ class IngestBalancerTest {
                 5672,
                 "admin",
                 "admin",
-                3);
+                10);
 
         sendIngestMessage(ingestBalancer.destinationIngest, messageBroker);
 
