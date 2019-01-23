@@ -84,7 +84,6 @@ public class IngestBalancer extends Thread implements MessageListener {
     private void setConfigurationValues(final Options options, final CommandLine commandLine) {
         if (commandLine.hasOption("message_broker_host")) {
             messageBrokerHost = commandLine.getOptionValue("message_broker_host");
-            LOGGER.info("message_broker_host=" + messageBrokerHost);
         }
 
         messageBrokerPort = Integer.parseInt(commandLine.getOptionValue("message_broker_port", "5672"));
@@ -97,13 +96,18 @@ public class IngestBalancer extends Thread implements MessageListener {
         destinationShardSize = commandLine.getOptionValue("destination_shard_size", "xqa.shard.size");
 
         insertThreadSecondaryWait = Integer.parseInt(commandLine.getOptionValue("insert_thread_secondary_wait", "5000"));
-        LOGGER.info("insert_thread_secondary_wait=" + insertThreadSecondaryWait);
 
         insertThreadWait = Integer.parseInt(commandLine.getOptionValue("insert_thread_wait", "60000"));
-        LOGGER.info("insert_thread_wait=" + insertThreadWait);
 
         poolSize = Integer.parseInt(commandLine.getOptionValue("pool_size", "4"));
-        LOGGER.info("pool_size=" + poolSize);
+
+        if (LOGGER.isInfoEnabled()) {
+            LOGGER.info("message_broker_host=" + messageBrokerHost);
+            LOGGER.info("insert_thread_secondary_wait=" + insertThreadSecondaryWait);
+            LOGGER.info("insert_thread_wait=" + insertThreadWait);
+            LOGGER.info("pool_size=" + poolSize);
+
+        }
     }
 
     private void initialiseIngestPool() {

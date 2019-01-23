@@ -88,12 +88,12 @@ class InserterThread extends Thread {
     }
 
     private synchronized List<Message> getSizeResponses(final MessageBroker shardSizeMessageBroker,
-                                                        final TemporaryQueue sizeReplyToDestination)
+                                                        final TemporaryQueue sizeReplyTo)
                                                             throws JMSException, MessageBrokerException {
 
         logger.debug(MessageFormat.format("{0}: START", ingestMessage.getJMSCorrelationID()));
 
-        final List<Message> shardSizeResponses = shardSizeMessageBroker.receiveMessagesTemporaryQueue(sizeReplyToDestination,
+        final List<Message> shardSizeResponses = shardSizeMessageBroker.receiveMessagesTemporaryQueue(sizeReplyTo,
                 ingestBalancer.insertThreadWait, ingestBalancer.insertThreadSecondaryWait);
 
         if (shardSizeResponses.isEmpty()) {
@@ -109,23 +109,24 @@ class InserterThread extends Thread {
         return shardSizeResponses;
     }
 
-    private synchronized void placeMessageBackOnOriginatingDestination()
+    private void placeMessageBackOnOriginatingDestination()
             throws JMSException, MessageBroker.MessageBrokerException {
         logger.warn("placeMessageBackOnOriginatingDestination");
 
-        final Message message =
-                MessageMaker.createMessage(
-                        inserterThreadMessageBroker.getSession(),
-                        inserterThreadMessageBroker.getSession().createQueue("xqa.ingest"),
-                        ingestMessage.getJMSCorrelationID(),
-                        ingestMessage.getJMSType(),
-                        MessageMaker.getBody(ingestMessage));
+        synchronized(this) {
+            final Message message = MessageMaker.createMessage(
+                inserterThreadMessageBroker.getSession(),
+                inserterThreadMessageBroker.getSession().createQueue("xqa.ingest"),
+                ingestMessage.getJMSCorrelationID(),
+                ingestMessage.getJMSType(),
+                MessageMaker.getBody(ingestMessage));
 
-        logger.warn(message.getJMSCorrelationID());
-        logger.warn(message.getJMSType());
-        logger.warn(DigestUtils.sha256Hex(MessageMaker.getBody(message)));
+            logger.warn(message.getJMSCorrelationID());
+            logger.warn(message.getJMSType());
+            logger.warn(DigestUtils.sha256Hex(MessageMaker.getBody(message)));
 
-        inserterThreadMessageBroker.sendMessage(message);
+            inserterThreadMessageBroker.sendMessage(message);
+        }
     }
 
     public Message findSmallestShard(final List<Message> shardSizeResponses) throws JMSException {
@@ -145,12 +146,14 @@ class InserterThread extends Thread {
         return smallestShard;
     }
 
-    private synchronized void insert(final Message smallestShard) throws JMSException, MessageBrokerException {
-        final Message message = MessageMaker.createMessage(inserterThreadMessageBroker.getSession(),
-                inserterThreadMessageBroker.getSession().createQueue(smallestShard.getJMSReplyTo().toString()),
-                ingestMessage.getJMSCorrelationID(), MessageMaker.getSubject(ingestMessage),
-                MessageMaker.getBody(ingestMessage));
+    private void insert(final Message smallestShard) throws JMSException, MessageBrokerException {
+        synchronized(this) {
+            final Message message = MessageMaker.createMessage(inserterThreadMessageBroker.getSession(),
+                    inserterThreadMessageBroker.getSession().createQueue(smallestShard.getJMSReplyTo().toString()),
+                    ingestMessage.getJMSCorrelationID(), MessageMaker.getSubject(ingestMessage),
+                    MessageMaker.getBody(ingestMessage));
 
-        inserterThreadMessageBroker.sendMessage(message);
+            inserterThreadMessageBroker.sendMessage(message);
+        }
     }
 }
